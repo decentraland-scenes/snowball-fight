@@ -6,6 +6,10 @@ export enum cubeColor {
     BLUE,
     RED
   }
+export enum teamColor {    
+    BLUE,
+    RED
+  }
 
 // reusable materials
 export let redMaterial = new Material()
@@ -28,7 +32,7 @@ lightBlueMaterial.roughness = 1
 
 
 export class Cone extends Entity{
-    color: cubeColor = cubeColor.NEUTRAL
+    color: teamColor = teamColor.BLUE
     room: Room
     constructor(position: TranformConstructorArgs, color, room){
 
@@ -43,13 +47,14 @@ export class Cone extends Entity{
         this.addComponent(
           new OnPointerDown(
             (e) => {
-                this.room.send("pickColor", {color: this.color})
+
+                this.room.send("pickColor", {color: this.color, teamColor:this.color})
                 // this.activate()
             },
-            { button: ActionButton.POINTER, hoverText: 'Pick color' }
+            { button: ActionButton.PRIMARY, hoverText: 'Pick ' +this.color + ' with E' }
           )
         )
-        if(this.color == cubeColor.RED){
+        if(this.color == teamColor.RED){
             this.addComponent(lightRedMaterial)
         } else {
             this.addComponent(lightBlueMaterial)
@@ -59,12 +64,14 @@ export class Cone extends Entity{
     }
 
     activate(){
-       if(this.color == cubeColor.RED){
+       if(this.color == teamColor.RED){
+           log("RED ACTIVATED")
             this.addComponentOrReplace(redMaterial)
             utils.setTimeout(1000, ()=>{
                 this.addComponentOrReplace(lightRedMaterial)
             })
-        }else if(this.color == cubeColor.BLUE){
+        }else if(this.color == teamColor.BLUE){
+            log("BLUE ACTIVATED")
             this.addComponentOrReplace(blueMaterial)
             utils.setTimeout(1000, ()=>{
                 this.addComponentOrReplace(lightBlueMaterial)

@@ -1,9 +1,14 @@
 import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
 import { Cone, cubeColor } from './cones'
+import { teamColor } from './modules/teamColors'
 import { connect } from './connection'
 import { Cube, cubes } from './cube'
+import { BallManager } from './modules/ball'
+import { player } from './modules/player'
 
 connect('my_room').then((room)=>{
+
+  player.addBallManager(new BallManager(100, room))
 
   // add cubes
   for (let i = 0; i < 8; i++) {
@@ -18,22 +23,41 @@ connect('my_room').then((room)=>{
   // add cones
   let blueCone = new Cone(
     {position: new Vector3(6, 1, 14)},
-    cubeColor.BLUE,
+    teamColor.BLUE,
     room
   )
 
   let redCone = new Cone(
     {position: new Vector3(10, 1, 14)},
-    cubeColor.RED,
+    teamColor.RED,
     room
   )
 
   room.onMessage("flashColor", (data)=>{
-    if(data.color == cubeColor.BLUE){
-      blueCone.activate()
-    } else {
-      redCone.activate()
-    }
+
+    switch(data.teamColor){
+      case teamColor.BLUE:{
+        log("SERVER BLUE")
+        blueCone.activate()
+        break
+      }
+      case 1:{
+        log("SERVER RED")
+        redCone.activate()
+      }
+    }    
+
+  })
+
+  room.onMessage("throwBall", (data)=>{    
+    //log("serverPos: " + data.pos.x + ",  " + data.pos.y + ", " + data.pos.z )
+    //log("serverDir: " + data.dir.x + ",  " + data.dir.y + ", " + data.dir.z )
+   // log("serverFor: " + data.force)
+    player.ballManager.spawnBall(data.teamColor).throwBallOther(
+      new Vector3(data.pos.x, data.pos.y, data.pos.z), 
+      new Vector3(data.dir.x, data.dir.y, data.dir.z),
+      data.force      
+      )
   })
 
   room.state.cubes.onAdd = (cubeData) => {

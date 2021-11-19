@@ -8,7 +8,9 @@
  import * as mySounds from "./sounds"
 //import { PhysicsBallCollider } from "./physicsBall";
 import { worldNoGravity, physicsMaterial, FIXED_TIME_STEPS, MAX_TIME_STEPS } from "./physics/world";
-import { SelfCollider } from "./player";
+import { player, SelfCollider } from "./player";
+import { teamColor } from "./teamColors";
+import { Room } from "node_modules/colyseus.js/lib/Room";
 
 // import { setKickForceUI } from "./ui";
 
@@ -40,9 +42,15 @@ export class Ball {
     bounceEmitter:Entity
     kickID:number = 0
     ownBall:boolean = true
+    room:Room
+    teamColor:teamColor = teamColor.BLUE
     //physicsCollider:PhysicsBallCollider
 
-    constructor(){
+    constructor(room:Room, _teamColor:teamColor){
+
+        this.teamColor = _teamColor
+        this.room = room
+
         this.ballShape = new GLTFShape('models/snowball.glb')
         this.ballEntity = new Entity()
         this.bounceEmitter = new Entity()
@@ -88,14 +96,16 @@ export class Ball {
         this.moveVector = dir.multiplyByFloats(force, force, force) 
         this.throwSound.playOnce()
         this.active = true
+        this.room.send("throwBall", {pos: pos, dir:dir, force:force})
     }
+
     throwBallOther(pos:Vector3, dir:Vector3, force:float){
         this.ownBall = false
         const ballTransform = this.ballEntity.getComponent(Transform) 
       
         ballTransform.position.copyFrom(pos)
 
-        this.moveVector = dir.multiplyByFloats(force, force, force) 
+        this.moveVector = dir
         this.throwSound.playOnce()
         this.active = true
     }
@@ -142,23 +152,26 @@ export class BallManager {
     balls:Ball[]
     maxCount:number
     ballSystem:BallThrowSystem
+    room:Room
 
-    constructor(_ballCount:number){
+    constructor(_ballCount:number, room:Room){
+        this.room = room
         this.balls = [] 
         this.maxCount = _ballCount   
         this.ballSystem = new BallThrowSystem(this)
         engine.addSystem(this.ballSystem)
     }
 
-    spawnBall():Ball{
+    spawnBall(_teamColor:number):Ball{
         if(this.balls.length < this.maxCount){
-            let ball = new Ball()
+            let ball = new Ball(this.room, _teamColor )
             this.balls.push(ball)
             return ball
         }
         else {
             let instance = this.balls.shift()
             this.balls.push(instance)
+            instance.teamColor = _teamColor
             return instance
         }
         
@@ -226,27 +239,34 @@ class BallThrowSystem {
                         (e) => {
                         if(e.didHit){                
 
-                            if(e.entity.meshName == "player_collider"){
-                                log("hit entity: " + e.entity.meshName)  
+                            //
+                            if(e.entity.meshName == "player_collider"){                                  
 
-                                if(ball.ownBall && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
-                                    log("your ball just hit you")
+                                if(ball.teamColor == player.color && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
+                                    log("a friendly " + ball.teamColor + " ball just hit you")
                                 }
-                                else if(!ball.ownBall && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
-                                    log("you were hit by enemy")
+                                else if(ball.teamColor != player.color && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
+                                    log("you were hit by enemy " +  ball.teamColor)
                                     let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
                                     normal.normalize()
                                     let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
                                     ball.onCollide(hitPoint,normal)
                                 }
                                 else{
-                                    log("enemy player hit")
+                                    log("enemy player hit with " + ball.teamColor + " ball")
                                     let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
                                     normal.normalize()
                                     let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
                                     ball.onCollide(hitPoint,normal)  
                                 }
                                 
+                            }
+                            else{
+                                log("environment hit with " + ball.teamColor + " ball")
+                                let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
+                                normal.normalize()
+                                let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
+                                ball.onCollide(hitPoint,normal)  
                             }
                             
                             

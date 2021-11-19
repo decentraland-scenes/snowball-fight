@@ -6,25 +6,30 @@ export enum cubeColor {
   RED
 }
 
+export enum teamColor {
+  BLUE,
+  RED
+}
+
 export class Player extends Schema {
   @type('string') id: string
-  @type('string') name: string
-  @type('number') color: cubeColor
+  @type('string') name: string  
+  @type('number') teamColor: teamColor
   constructor(id: string, name: string) {
     super()
     this.id = id
-    this.name = name
-    this.color = cubeColor.NEUTRAL
+    this.name = name    
+    this.teamColor = teamColor.BLUE
   }
 }
 
 export class Cube extends Schema {
   @type('number') id: number
-  @type('number') color: cubeColor
+  @type('number') color: teamColor
   constructor(id: number) {
     super()
     this.id = id
-    this.color = cubeColor.NEUTRAL
+    this.color = teamColor.BLUE
   }
 }
 
