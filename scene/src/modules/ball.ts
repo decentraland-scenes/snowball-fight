@@ -11,6 +11,7 @@ import { worldNoGravity, physicsMaterial, FIXED_TIME_STEPS, MAX_TIME_STEPS } fro
 import { player, SelfCollider } from "./player";
 import { teamColor } from "./teamColors";
 import { Room } from "node_modules/colyseus.js/lib/Room";
+import { OtherCollider } from "./otherPlayer";
 
 // import { setKickForceUI } from "./ui";
 
@@ -242,24 +243,39 @@ class BallThrowSystem {
                             //
                             if(e.entity.meshName == "player_collider"){                                  
 
-                                if(ball.teamColor == player.color && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
-                                    log("a friendly " + ball.teamColor + " ball just hit you")
+                                //player was hit
+                                if(engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
+                                    
+                                    //hit by a teammate
+                                    if(ball.teamColor == player.color){
+                                        log("a friendly " + ball.teamColor + " ball just hit you")
+                                    }
+                                    //hit by enemy
+                                    else{
+                                        log("you were hit by enemy " +  ball.teamColor)
+                                        let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
+                                        normal.normalize()
+                                        let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
+                                        ball.onCollide(hitPoint,normal)
+                                        player.clipHit.play(true)
+                                    }
                                 }
-                                else if(ball.teamColor != player.color && engine.entities[e.entity.entityId].hasComponent(SelfCollider)){
-                                    log("you were hit by enemy " +  ball.teamColor)
-                                    let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
-                                    normal.normalize()
-                                    let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
-                                    ball.onCollide(hitPoint,normal)
-                                }
-                                else{
-                                    log("enemy player hit with " + ball.teamColor + " ball")
-                                    let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
-                                    normal.normalize()
-                                    let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
-                                    ball.onCollide(hitPoint,normal)  
-                                }
-                                
+                                //someone else was hit
+                                else if(engine.entities[e.entity.entityId].hasComponent(OtherCollider)){
+                                    engine.entities[e.entity.entityId].getComponent(OtherCollider)
+                                    //teammate was hit
+                                    if(ball.teamColor == engine.entities[e.entity.entityId].getComponent(OtherCollider).color){
+                                        log("Teammate player hit with " + ball.teamColor + " ball (other player is "+ engine.entities[e.entity.entityId].getComponent(OtherCollider).color +")")
+                                    }
+                                    //enemy was hit
+                                    else{
+                                        log("Enemy player hit with " + ball.teamColor + " ball (enemy color is: " + engine.entities[e.entity.entityId].getComponent(OtherCollider).color )
+                                        let normal = new Vector3(e.hitNormal.x, e.hitNormal.y, e.hitNormal.z)
+                                        normal.normalize()
+                                        let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
+                                        ball.onCollide(hitPoint,normal) 
+                                    }
+                                }  
                             }
                             else{
                                 log("environment hit with " + ball.teamColor + " ball")

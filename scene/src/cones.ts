@@ -1,5 +1,6 @@
 import * as utils from '@dcl/ecs-scene-utils'
 import { Room } from 'colyseus.js'
+import { player } from './modules/player'
 
 export enum cubeColor {
     NEUTRAL,
@@ -49,6 +50,7 @@ export class Cone extends Entity{
             (e) => {
 
                 this.room.send("pickColor", {color: this.color, teamColor:this.color})
+                player.setColor(this.color)
                 // this.activate()
             },
             { button: ActionButton.PRIMARY, hoverText: 'Pick ' +this.color + ' with E' }

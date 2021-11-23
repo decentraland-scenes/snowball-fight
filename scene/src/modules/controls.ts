@@ -6,8 +6,8 @@ import { player } from "./player"
 //let player = Camera.instance
 
 
-let offsetVecOriginal = new Vector3(0.6, 0.0, 0)
-let offsetVec = new Vector3(0.6, 0.0, 0)
+let offsetVecOriginal = new Vector3(0.5, 0.0, 0)
+let offsetVec = new Vector3(0.5, 0.0, 0)
 let throwDirOriginal = new Vector3(0, 0.1, 1)
 let throwDir = new Vector3(0, 0.1, 1)
 const input = Input.instance
@@ -20,25 +20,17 @@ input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
         if(player.cam.cameraMode == CameraMode.ThirdPerson){
             player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
 
-            let box = new Entity()
-            box.addComponent(new Transform({position: new Vector3(player.cam.position.x, player.cam.position.y +1, player.cam.position.z+2)}))
-            //box.addComponent(new BoxShape())
-            box.addComponent(new TextShape("3rd Person"))
-           // engine.addEntity(box)
+            player.clipThrow.play(true)
+            
         }
         else{
             player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
 
-            let sphere = new Entity()
-            sphere.addComponent(new Transform({position: new Vector3(player.cam.position.x, player.cam.position.y +1, player.cam.position.z+2)}))
-            //sphere.addComponent(new SphereShape())
-            sphere.addComponent(new TextShape("FPS"))
-            //engine.addEntity(sphere)
         }
         
         //ball.moveVector.copyFrom(throwDir.rotate(player.rotation))  
        // physicsBall.playerThrow(player.position.add(offsetVec.rotate(player.rotation)),throwDir.rotate(player.rotation), 200)
-        //triggerEmote({ predefined: PredefinedEmote.SHRUG })
+        //triggerEmote({ predefined: PredefinedEmote.RAISE_HAND })
 })
 
 // let dummyEnemy = new Entity()

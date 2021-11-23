@@ -5,11 +5,12 @@ export class MyRoom extends Room<MyRoomState> {
   onCreate(options: any) {
     this.setState(new MyRoomState())
   
+
     this.onMessage('pickColor', (client, message) => {
       const player = this.state.players.get(client.sessionId)
       //player.color = message.color
       player.teamColor = message.teamColor
-      this.broadcast("flashColor", {teamColor: message.teamColor})
+      this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})
       //this.send(client, "flashColor", {color: message.color})
       console.log(player.name, ' picked color ', message.color)
     })
@@ -23,14 +24,26 @@ export class MyRoom extends Room<MyRoomState> {
     })
 
 
-    this.onMessage('setColor', (client, message) => {
-      const player = this.state.players.get(client.sessionId) 
-      this.state.cubes.forEach((cube)=>{
-        if(cube.id == message.id){
-          cube.color = player.teamColor
-        }
-      })
-      console.log(player.name, ' changed ', message.id, " to ", player.teamColor)
+    // this.onMessage('setColor', (client, message) => {
+    //   const player = this.state.players.get(client.sessionId) 
+    //   this.state.cubes.forEach((cube)=>{
+    //     if(cube.id == message.id){
+    //       cube.color = player.teamColor
+    //     }
+    //   })
+    //   console.log(player.name, ' changed ', message.id, " to ", player.teamColor)
+    // })
+
+    this.onMessage('playerPos', (client, message) => {
+      const player = this.state.players.get(client.sessionId)
+
+     // if(player.id === message.id){
+        this.broadcast("updatePos", {id:message.id, pos:message.pos, rot:message.rot },{except: client})
+      
+       // console.log(player.name, ' posUpdated ', message.id, message.pos.x)
+     // }
+            
+      
     })
 
   }
@@ -43,6 +56,15 @@ export class MyRoom extends Room<MyRoomState> {
     )
     this.state.players.set(client.sessionId, newPlayer)
     console.log(newPlayer.name, 'joined! => ', options.userData)
+    client.send("updateID", {id:client.id} )
+    this.broadcast("newPlayerJoined", {id:client.id}, {except:client})
+
+    //send all current players to the new player
+    this.state.players.forEach( (player)=>{
+      client.send("newPlayerJoined", {id:player.id})
+    })
+      
+    
   }
 
   onLeave(client: Client, consented: boolean) {
