@@ -63,6 +63,7 @@ connect('my_room').then((room)=>{
     //log("serverPos: " + data.pos.x + ",  " + data.pos.y + ", " + data.pos.z )
     //log("serverDir: " + data.dir.x + ",  " + data.dir.y + ", " + data.dir.z )
    // log("serverFor: " + data.force)
+   player.enemyManager.getEnemyByID(data.id).clipThrow.play(true)
    log('SERVER: BALLTHROW : ' + data.teamColor)
    let color = (data.teamColor == 0)?teamColor.BLUE:teamColor.RED
     player.ballManager.spawnBall(color).throwBallOther(
@@ -72,6 +73,7 @@ connect('my_room').then((room)=>{
       )
   })
 
+  //OTHER PLAYER JOINS THE SERVER ROOM
   room.onMessage("newPlayerJoined", (data)=>{    
     log("new player JOINED: " + data.id )
     
@@ -79,6 +81,15 @@ connect('my_room').then((room)=>{
     
   })
 
+  //OTHER PLAYER LEAVES THE SERVER ROOM
+  room.onMessage("playerLeft", (data)=>{    
+    log("player left the game: " + data.id )
+    
+    player.enemyManager.removeEnemy(data.id)
+    
+  })
+
+  // PLAYER GETS THEIR OWN ID
   room.onMessage("updateID", (data)=>{    
     log("Your ID is: " + data.id )
     
@@ -86,6 +97,7 @@ connect('my_room').then((room)=>{
 
   })
 
+  // OTHER PLAYER POSITION GETS UPDATED
   room.onMessage("updatePos", (data)=>{    
    // log("Updating enemy POS: " + data.id  + ", " + data.pos.x + ", " + data.pos.y + ", " + data.pos.z)
     

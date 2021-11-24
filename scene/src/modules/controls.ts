@@ -1,6 +1,6 @@
 //import { physicsBall } from "./physicsBall"
 import { BallManager } from "./ball"
-import { triggerEmote, PredefinedEmote } from "@decentraland/RestrictedActions"
+import { triggerEmote, PredefinedEmote,  } from "@decentraland/RestrictedActions"
 import { player } from "./player"
 
 //let player = Camera.instance
@@ -19,9 +19,7 @@ input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
 
         if(player.cam.cameraMode == CameraMode.ThirdPerson){
             player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
-
-            player.clipThrow.play(true)
-            
+            player.clipThrow.play(true)                       
         }
         else{
             player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)

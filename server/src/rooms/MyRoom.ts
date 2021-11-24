@@ -7,19 +7,15 @@ export class MyRoom extends Room<MyRoomState> {
   
 
     this.onMessage('pickColor', (client, message) => {
-      const player = this.state.players.get(client.sessionId)
-      //player.color = message.color
+      const player = this.state.players.get(client.sessionId)      
       player.teamColor = message.teamColor
-      this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})
-      //this.send(client, "flashColor", {color: message.color})
+      this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})      
       console.log(player.name, ' picked color ', message.color)
     })
   
     this.onMessage('throwBall', (client, message) => {
-      const player = this.state.players.get(client.sessionId)
-            
-      this.broadcast("throwBall", {pos:message.pos, dir: message.dir, force: message.force, teamColor:player.teamColor },{except: client})
-      //this.send(client, "flashColor", {color: message.color})
+      const player = this.state.players.get(client.sessionId)            
+      this.broadcast("throwBall", {pos:message.pos, dir: message.dir, force: message.force, teamColor:player.teamColor, id:player.id },{except: client})      
       console.log(player.name, ' threw a snowball ', message.pos, message.dir, message.force)
     })
 
@@ -57,7 +53,7 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.set(client.sessionId, newPlayer)
     console.log(newPlayer.name, 'joined! => ', options.userData)
     client.send("updateID", {id:client.id} )
-    this.broadcast("newPlayerJoined", {id:client.id}, {except:client})
+    this.broadcast("newPlayerJoined", {id:client.id, color:newPlayer.teamColor}, {except:client})
 
     //send all current players to the new player
     this.state.players.forEach( (player)=>{
@@ -70,7 +66,7 @@ export class MyRoom extends Room<MyRoomState> {
   onLeave(client: Client, consented: boolean) {
     const player = this.state.players.get(client.sessionId)
     console.log(player.name, 'left!')
-
+    this.broadcast("playerLeft", {id:client.id }, {except:client})
     this.state.players.delete(client.sessionId)
   }
 

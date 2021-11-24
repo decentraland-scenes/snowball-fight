@@ -189,7 +189,7 @@ class BallThrowSystem {
         ballManager:BallManager
 
        
-        constructor(_ballManager){
+        constructor(_ballManager:BallManager){
             this.physicsCast = PhysicsCast.instance
             this.ballManager = _ballManager
         }
