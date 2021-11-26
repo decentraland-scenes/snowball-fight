@@ -7,7 +7,7 @@
 // //import { match } from "./match";
  import * as mySounds from "./sounds"
 //import { PhysicsBallCollider } from "./physicsBall";
-import { worldNoGravity, physicsMaterial, FIXED_TIME_STEPS, MAX_TIME_STEPS } from "./physics/world";
+//import { worldNoGravity, physicsMaterial, FIXED_TIME_STEPS, MAX_TIME_STEPS } from "./physics/world";
 import { player, SelfCollider } from "./player";
 import { teamColor } from "./teamColors";
 import { Room } from "node_modules/colyseus.js/lib/Room";
@@ -195,7 +195,7 @@ class BallThrowSystem {
         }
 
         update(dt: number) { 
-            worldNoGravity.step(FIXED_TIME_STEPS, dt, MAX_TIME_STEPS)
+           // worldNoGravity.step(FIXED_TIME_STEPS, dt, MAX_TIME_STEPS)
 
             for(let ball of this.ballManager.balls){
                         
@@ -207,7 +207,7 @@ class BallThrowSystem {
                 
                     //ground hit
                     if(transform.position.y + ball.moveVector.y <= ball.ballRadius){            
-                        ball.onCollide(new Vector3(transform.position.x, 0, transform.position.z), Vector3.Up())
+                        ball.onCollide(new Vector3(transform.position.x, 0.05, transform.position.z), Vector3.Up())
                     }     
                     
                     ball.moveVector = ball.moveVector.multiplyByFloats(ball.resistance, ball.resistance, ball.resistance)

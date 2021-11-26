@@ -15,7 +15,7 @@ export class OtherPlayer {
     id:string
     collider:Entity
     //ballManager:BallManager
-    cam:Camera 
+    //:Camera 
     color:teamColor = teamColor.BLUE
     material:Material
     testDummy:Entity

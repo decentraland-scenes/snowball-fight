@@ -1,5 +1,5 @@
 import { Room, Client } from 'colyseus'
-import { cubeColor, MyRoomState, Player } from './schema/MyRoomState'
+import { cubeColor, MyRoomState, Player, teamColor } from './schema/MyRoomState'
 
 export class MyRoom extends Room<MyRoomState> {
   onCreate(options: any) {
@@ -10,7 +10,7 @@ export class MyRoom extends Room<MyRoomState> {
       const player = this.state.players.get(client.sessionId)      
       player.teamColor = message.teamColor
       this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})      
-      console.log(player.name, ' picked color ', message.color)
+      console.log(player.name, ' picked color ', message.teamColor)
     })
   
     this.onMessage('throwBall', (client, message) => {
@@ -51,7 +51,19 @@ export class MyRoom extends Room<MyRoomState> {
       options.userData.displayName || 'Anonymous'
     )
     this.state.players.set(client.sessionId, newPlayer)
-    console.log(newPlayer.name, 'joined! => ', options.userData)
+    switch(options.color){
+      case 0:{
+        console.log(newPlayer.name, 'joined the BLUE team! => ', options.color, options.userData)
+        newPlayer.teamColor = teamColor.BLUE
+        break
+      }
+      case 1:{
+        console.log(newPlayer.name, 'joined the RED team! => ', options.color, options.userData)
+        newPlayer.teamColor = teamColor.RED
+        break
+      }
+    }    
+    
     client.send("updateID", {id:client.id} )
     this.broadcast("newPlayerJoined", {id:client.id, color:newPlayer.teamColor}, {except:client})
 

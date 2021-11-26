@@ -10,6 +10,7 @@
 import { Client, Room } from 'colyseus.js'
 import { isPreviewMode, getCurrentRealm } from '@decentraland/EnvironmentAPI'
 import { getUserData, UserData } from '@decentraland/Identity'
+import { teamColor } from './modules/teamColors'
 
 export let userData: UserData | null
 
@@ -20,6 +21,11 @@ export async function setUserData() {
 export async function connect(roomName: string, options: any = {}) {
   const isPreview = await isPreviewMode()
   const realm = await getCurrentRealm()
+
+  //
+  //CHANGE THIS FOR EACH SIDE'S WEARABLES
+  //
+  options.color = teamColor.BLUE
 
   //
   // make sure users are matched together by the same "realm".
@@ -34,6 +40,7 @@ export async function connect(roomName: string, options: any = {}) {
     await setUserData()
   }
   options.userData = userData
+
 
   log('data sent:', options)
 

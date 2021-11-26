@@ -8,7 +8,7 @@ export class SelfCollider {
 }
 
 export class Player {
-    id:number
+    id:string
     collider:Entity
     ballManager:BallManager
     enemyManager:EnemyManager
@@ -22,8 +22,9 @@ export class Player {
     roomConnected:boolean = false
     room:Room
 
-    constructor(){
+    constructor(color:teamColor){
         
+        this.id = "0x0"
         this.cam = Camera.instance
         this.collider = new Entity()        
         this.collider.addComponent(new Transform({
@@ -88,7 +89,7 @@ export class Player {
     }
 }
 
-export let player = new Player()
+export let player = new Player(teamColor.BLUE)
 
 
 

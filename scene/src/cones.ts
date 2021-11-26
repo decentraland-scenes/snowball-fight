@@ -35,7 +35,7 @@ lightBlueMaterial.roughness = 1
 export class Cone extends Entity{
     color: teamColor = teamColor.BLUE
     room: Room
-    constructor(position: TranformConstructorArgs, color, room){
+    constructor(position: TranformConstructorArgs, color:teamColor, room:Room){
 
        super()
        this.color = color

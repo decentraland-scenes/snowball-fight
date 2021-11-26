@@ -2,7 +2,6 @@ import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
 import { Cone, cubeColor } from './cones'
 import { teamColor } from './modules/teamColors'
 import { connect } from './connection'
-import { Cube, cubes } from './cube'
 import { BallManager } from './modules/ball'
 import { player, Player } from './modules/player'
 import { EnemyManager } from './modules/enemyManager'
@@ -17,17 +16,8 @@ connect('my_room').then((room)=>{
   player.setRoom(room)
   player.addEnemyManager(new EnemyManager())
 
-  // add cubes
-  for (let i = 0; i < 8; i++) {
-    let cube = new Cube(
-      {
-        position: new Vector3(i * 2 + 1, 1, 4),
-      }, i, room
-    )
-  }
-
-
-  // add cones
+ 
+  // REMOVE: add cones
   let blueCone = new Cone(
     {position: new Vector3(6, 1, 14)},
     teamColor.BLUE,
@@ -75,7 +65,7 @@ connect('my_room').then((room)=>{
 
   //OTHER PLAYER JOINS THE SERVER ROOM
   room.onMessage("newPlayerJoined", (data)=>{    
-    log("new player JOINED: " + data.id )
+    log("new player JOINED: " + data.id, + ": " + data.color )
     
     player.enemyManager.addEnemy(data.id, teamColor.BLUE)
     
@@ -105,35 +95,25 @@ connect('my_room').then((room)=>{
 
   })
 
-  // room.state.cubes.onAdd = (cubeData) => {
-  //   log('Added cube => ', cubeData.id)
-  //   cubeData.listen('color', (value) => {
-    
-  //     cubes[cubeData.id].activate(value)
-      
-  //   })
-  // }
-
-  
 
 })
 
 
 
 
-// ground
-let floor = new Entity()
-floor.addComponent(new GLTFShape('models/FloorBaseGrass.glb'))
-floor.addComponent(
-  new Transform({
-    position: new Vector3(23*16/2, 0, 23*16/2),
-    scale: new Vector3(24, 0.1, 24),
-  })
-)
-engine.addEntity(floor)
+// // ground
+// let floor = new Entity()
+// floor.addComponent(new GLTFShape('models/FloorBaseGrass.glb'))
+// floor.addComponent(
+//   new Transform({
+//     position: new Vector3(23*16/2, 0, 23*16/2),
+//     scale: new Vector3(24, 0.1, 24),
+//   })
+// )
+// engine.addEntity(floor)
 
 class SendPlayerDataSystem {
-  freq:number = 1/10
+  freq:number = 1/6
   playerRef:Player
 
   constructor(_player:Player){
@@ -144,7 +124,7 @@ class SendPlayerDataSystem {
           this.freq -= dt
       }
       else{
-          this.freq = 1/10
+          this.freq = 1/6
           //SEND POS DATA
           if(this.playerRef.roomConnected){
               this.playerRef.room.send('playerPos', {id:this.playerRef.id, pos:this.playerRef.cam.position, rot:this.playerRef.getHorizontalRotation()})
