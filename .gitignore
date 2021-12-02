@@ -36,6 +36,8 @@ scene/bin
 server/bin
 server/lib
 
+server/src/firebase
+
 # Dependency directories
 scene/node_modules/
 jspm_packages/
