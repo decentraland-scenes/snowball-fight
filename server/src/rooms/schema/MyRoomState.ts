@@ -14,32 +14,30 @@ export enum teamColor {
 export class Player extends Schema {
   @type('string') id: string
   @type('string') name: string  
+  @type('string') wallet: string  
   @type('number') teamColor: teamColor
-  constructor(id: string, name: string) {
+  @type('number') score: number
+
+  constructor(id: string, name: string, wallet: string) {
     super()
     this.id = id
     this.name = name    
     this.teamColor = teamColor.BLUE
-  }
-}
-
-export class Cube extends Schema {
-  @type('number') id: number
-  @type('number') color: teamColor
-  constructor(id: number) {
-    super()
-    this.id = id
-    this.color = teamColor.BLUE
+    this.wallet = wallet
+    this.score = 0
+    
   }
 }
 
 export class MyRoomState extends Schema {
-  @type([Cube ]) cubes = new ArraySchema<Cube>()
+  //@type([Cube ]) cubes = new ArraySchema<Cube>()
   @type({ map: Player }) players = new MapSchema<Player>()
-  constructor(cubeCount: number = 8){
+  @type('number') gameTime: number
+  @type('number') blueScore: number = 0
+  @type('number') redScore: number = 0
+
+  constructor(time: number = 0){
     super()
-    for (let i= 0; i <= cubeCount; i++){
-      this.cubes.push(new Cube(i))
-    }
+    this.gameTime = time
   }
 }

@@ -143,6 +143,9 @@ export class Ball {
         const pos = this.ballEntity.getComponent(Transform).position
         this.setBallPosXYZ(pos.x,-0.3,pos.z)
     }
+    sendHit(enemyId:string){
+        this.room.send('enemyHit', {id:enemyId, pos:player.cam.position })
+    }
   }
   
   
@@ -274,6 +277,9 @@ class BallThrowSystem {
                                         normal.normalize()
                                         let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
                                         ball.onCollide(hitPoint,normal) 
+
+                                        ball.sendHit(engine.entities[e.entity.entityId].getComponent(OtherCollider).id)
+                                        
                                     }
                                 }  
                             }

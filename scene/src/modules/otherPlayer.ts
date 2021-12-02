@@ -4,9 +4,11 @@ import { teamColor } from "./teamColors"
 @Component("OtherCollider")
 export class OtherCollider {
     color:teamColor  
+    id:string
     
-    constructor(_color:teamColor){
+    constructor(_color:teamColor, _id:string){
         this.color = _color
+        this.id = _id
     }
     
 }
@@ -32,17 +34,17 @@ export class OtherPlayer {
         switch(color){
             case teamColor.BLUE:{
                 this.material.albedoColor = Color4.Blue()
-                this.collider.addComponent(new OtherCollider(teamColor.BLUE))
+                this.collider.addComponent(new OtherCollider(teamColor.BLUE, this.id))
                 break
             }
             case teamColor.RED: {
                 this.material.albedoColor = Color4.Red()
-                this.collider.addComponent(new OtherCollider(teamColor.RED))
+                this.collider.addComponent(new OtherCollider(teamColor.RED, this.id))
                 break
             }
             default : {
                 this.material.albedoColor = Color4.Blue()
-                this.collider.addComponent(new OtherCollider(teamColor.BLUE))
+                this.collider.addComponent(new OtherCollider(teamColor.BLUE, this.id))
                 teamColor.BLUE
             }
         }

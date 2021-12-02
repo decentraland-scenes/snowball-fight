@@ -7,9 +7,6 @@ import { player, Player } from './modules/player'
 import { EnemyManager } from './modules/enemyManager'
 
 
-
-
-
 connect('my_room').then((room)=>{
 
   player.addBallManager(new BallManager(100, room))
@@ -91,7 +88,13 @@ connect('my_room').then((room)=>{
   room.onMessage("updatePos", (data)=>{    
    // log("Updating enemy POS: " + data.id  + ", " + data.pos.x + ", " + data.pos.y + ", " + data.pos.z)
     
-    player.enemyManager.updatePlayerPos(data.id,  data.pos.x, data.pos.y, data.pos.z, data.rot.x, data.rot.y, data.rot.z, data.rot.w)
+    player.enemyManager.updatePlayerPos(data.id, data.pos.x, data.pos.y, data.pos.z, data.rot.x, data.rot.y, data.rot.z, data.rot.w)
+
+  })
+
+  // CURRENT TIME FROM SERVER
+  room.onMessage("time", (data)=>{    
+    log("SERVER Time is : " + data.currentTime  )    
 
   })
 
