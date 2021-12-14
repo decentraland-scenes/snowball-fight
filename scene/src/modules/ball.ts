@@ -45,12 +45,14 @@ export class Ball {
     ownBall:boolean = true
     room:Room
     teamColor:teamColor = teamColor.BLUE
+    myBall:boolean = false
     //physicsCollider:PhysicsBallCollider
 
-    constructor(room:Room, _teamColor:teamColor){
+    constructor(room:Room, _teamColor:teamColor, _myBall:boolean){
 
         this.teamColor = _teamColor
         this.room = room
+        this.myBall = _myBall
 
         this.ballShape = new GLTFShape('models/snowball.glb')
         this.ballEntity = new Entity()
@@ -166,9 +168,10 @@ export class BallManager {
         engine.addSystem(this.ballSystem)
     }
 
-    spawnBall(_teamColor:number):Ball{
+    spawnBall(_teamColor:number, _myBall:boolean):Ball{
+        log("spawning ball is mine: " + _myBall)
         if(this.balls.length < this.maxCount){
-            let ball = new Ball(this.room, _teamColor )
+            let ball = new Ball(this.room, _teamColor, _myBall )
             this.balls.push(ball)
             return ball
         }
@@ -176,6 +179,7 @@ export class BallManager {
             let instance = this.balls.shift()
             this.balls.push(instance)
             instance.teamColor = _teamColor
+            instance.myBall = _myBall
             return instance
         }
         
@@ -278,7 +282,11 @@ class BallThrowSystem {
                                         let hitPoint = new Vector3(e.hitPoint.x, e.hitPoint.y, e.hitPoint.z)
                                         ball.onCollide(hitPoint,normal) 
 
-                                        ball.sendHit(engine.entities[e.entity.entityId].getComponent(OtherCollider).id)
+                                       
+                                        if(ball.myBall){                                            
+                                            ball.sendHit(engine.entities[e.entity.entityId].getComponent(OtherCollider).id)
+                                        }
+                                        
                                         
                                     }
                                 }  

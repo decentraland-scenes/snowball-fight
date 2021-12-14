@@ -5,6 +5,7 @@ import { connect } from './connection'
 import { BallManager } from './modules/ball'
 import { player, Player } from './modules/player'
 import { EnemyManager } from './modules/enemyManager'
+import * as ui from './modules/ui'
 
 
 connect('my_room').then((room)=>{
@@ -53,7 +54,7 @@ connect('my_room').then((room)=>{
    player.enemyManager.getEnemyByID(data.id).clipThrow.play(true)
    log('SERVER: BALLTHROW : ' + data.teamColor)
    let color = (data.teamColor == 0)?teamColor.BLUE:teamColor.RED
-    player.ballManager.spawnBall(color).throwBallOther(
+    player.ballManager.spawnBall(color, false).throwBallOther(
       new Vector3(data.pos.x, data.pos.y, data.pos.z), 
       new Vector3(data.dir.x, data.dir.y, data.dir.z),
       data.force      
@@ -94,8 +95,55 @@ connect('my_room').then((room)=>{
 
   // CURRENT TIME FROM SERVER
   room.onMessage("time", (data)=>{    
-    log("SERVER Time is : " + data.currentTime  )    
+    //log("SERVER Time is : " + data.currentTime  )    
+    ui.updateGameTime(data.currentTime)
+  })
 
+  // CURRENT LOBBY TIME FROM SERVER
+  room.onMessage("lobbytime", (data)=>{    
+    //log("SERVER is in LOBBY WATING state : " + data.currentTime  )    
+    ui.updateGameTime(data.currentTime)
+    ui.DisplayCursorMessage("NEXT MATCH STARTING IN:", data.currentTime)
+  })
+
+  // START MATCH
+  room.onMessage("startMatch", ()=>{    
+    log("MATCH STARTED" )    
+    ui.resetUIScores()
+    ui.HideCursorMessage()
+    ui.DisplayCursorMessage("GAME STARTED!", "GO GO GO", 2)
+    player.matchStarted = true
+  })
+
+  room.onMessage("matchIsLive", ()=>{    
+        
+    //ui.resetUIScores()
+    //ui.HideCursorMessage()
+    ui.DisplayCursorMessage("GAME IS LIVE!", "GO GO GO", 2)
+    player.matchStarted = true
+  })
+
+  // END MATCH
+  room.onMessage("endMatch", (data)=>{    
+    log("MATCH FINISHED" )  
+
+    player.matchStarted = false
+    if(data.winner == 0){
+      ui.DisplayCursorMessage("GAME ENDED", "BLUE WINS", 4)
+    }  
+    if(data.winner == 1){
+      ui.DisplayCursorMessage("GAME ENDED", "RED WINS", 4)
+    }  
+    if(data.winner == 2){
+      ui.DisplayCursorMessage("GAME ENDED", "TEAMS ARE TIED", 4)
+    }  
+    
+  })
+
+  // CURRENT SCORES FROM SERVER
+  room.onMessage("score", (data)=>{    
+    log("SCORES ARE UPDATED: " + data.scoreBlue + ":" +  data.scoreRed )    
+    ui.updateUIScores(data.scoreBlue, data.scoreRed)
   })
 
 
@@ -133,6 +181,9 @@ class SendPlayerDataSystem {
               this.playerRef.room.send('playerPos', {id:this.playerRef.id, pos:this.playerRef.cam.position, rot:this.playerRef.getHorizontalRotation()})
               //log("sendPOS: ID: " + this.playerRef.id + ", POS: " + this.playerRef.cam.position)
           }
+
+          //CHECK IF PLAYER IS STANDING ON A DEFAULT PARCEL
+          this.playerRef.checkDefaultParcel()
 
       }
   }

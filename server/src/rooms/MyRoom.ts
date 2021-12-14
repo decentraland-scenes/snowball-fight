@@ -6,13 +6,76 @@ import { serviceAccount } from '../firebase/firebase_api'
 
 export class MyRoom extends Room<MyRoomState> {
 
-  public delayedInterval!: Delayed;
-  public roundTime: number = 1000 * 60 * 10  
-  //public endTime: number = this.roundTime
+  public matchIntervalLoop!: Delayed;
+  public roundTime: number = 1000 * 60 * 0.5  
+  public lobbyTime: number = 1000 * 60 * 0.2  
+  private db:FirebaseFirestore.Firestore    
+  private matchElapsed:number = 0
+  private lobbyElapsed:number = 0
+
+  constructor(){
+    super()
+    
+
+    //
+    // !!!!!!! DELETE EVERY MATCH !!!!!!!!!!!!
+    //
+    // this.db.collection('matches').get().then(querySnapshot => {
+    //   querySnapshot.docs.forEach(snapshot => {
+    //       snapshot.ref.delete();
+    //   })
+    // })
+    //
+    // !!!!!! DELETE EVERY MATCH !!!!!!!!!!!!
+    //
+
+  }
+  update(dt:number){
+
+    if(this.state.inMatch){
+
+      this.matchElapsed += dt
+
+      if(this.matchElapsed < this.roundTime){
+        this.broadcast("time", {currentTime:Math.floor((this.roundTime - this.matchElapsed)/1000)})
+      }
+      else{
+        this.state.inMatch = false
+        this.lobbyElapsed = 0
+        this.saveScores(this.state.blueScore, this.state.redScore)
+
+        if(this.state.blueScore > this.state.redScore){
+          this.broadcast("endMatch", {winner:0})
+        }
+        if(this.state.blueScore < this.state.redScore){
+          this.broadcast("endMatch", {winner:1})
+        }
+        if(this.state.blueScore == this.state.redScore){
+          this.broadcast("endMatch", {winner:2})
+        }
+      }     
+    }
+    else{
+      this.lobbyElapsed += dt
+      if(this.lobbyElapsed < this.lobbyTime){
+        this.broadcast("lobbytime", {currentTime:Math.floor((this.lobbyTime - this.lobbyElapsed)/1000)})
+      }
+      else{
+        this.state.inMatch = true
+        this.matchElapsed = 0
+
+        this.state.resetScores()
+        //this.state.startTime = this.clock.currentTime
+        this.state.startTime = new Date().toISOString()
+        
+        this.broadcast("startMatch")
+
+      }
+    }
+  }
 
   onCreate(options: any) {
     this.setState(new MyRoomState())
-    
     //SCORE DATABASE SETUP
     var admin = require("firebase-admin");
 
@@ -20,42 +83,24 @@ export class MyRoom extends Room<MyRoomState> {
       credential: admin.credential.cert(serviceAccount)
     });
 
-    const db = getFirestore();
-    const docRef = db.collection('scores').doc('leaderboard');
-
-    //TODO:sync to UTC schedule
-    // start the clock ticking
-    this.clock.start();  
+    this.db = getFirestore();
     
-    //this.endTime = this.clock.currentTime + this.roundTime
+    //this.state.startTime = this.clock.currentTime
+    this.state.startTime = new Date().toISOString()
+    //const playerLeaderboard = db.collection('scores').doc('leaderboard');
+    const redTeamDoc = this.db.collection('teams').doc('redTeam');
+    const blueTeamDoc =this.db.collection('teams').doc('blueTeam');
+    
+    //update time every 1 second
+    this.setSimulationInterval((deltaTime) => this.update(deltaTime), 1000);
 
-        // Set an interval and store a reference to it
-    // so that we may clear it later
-    this.delayedInterval = this.clock.setInterval(() => {
-        console.log("Time now " + this.clock.currentTime);
-        console.log("Time left " + (this.roundTime - this.clock.elapsedTime));
-        this.broadcast("time", {currentTime:Math.floor((this.clock.elapsedTime)/1000)})
-    }, 1000);
-
-    // After 10 seconds clear the timeout;
-    // this will *stop and destroy* the timeout completely
-    this.clock.setTimeout(() => {
-        this.delayedInterval.clear();
-    }, this.roundTime);
-
-
+   
     this.onMessage('pickColor', (client, message) => {
       const player = this.state.players.get(client.sessionId)      
       player.teamColor = message.teamColor
       this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})      
       console.log(player.name, ' picked color ', message.teamColor)
       player.score ++
-
-      docRef.update({
-        userID: player.wallet,
-        team: player.teamColor,
-        score: player.score
-      });
 
     })
   
@@ -66,9 +111,38 @@ export class MyRoom extends Room<MyRoomState> {
     })
   
     this.onMessage('enemyHit', (client, message) => {
-      const player = this.state.players.get(message.id)            
-      
-      console.log(message.id, ' was hit!! they were on team: ', player.teamColor)
+      const enemy = this.state.players.get(message.id)            
+      const player = this.state.players.get(client.sessionId)  
+
+      if(this.state.inMatch){
+        player.score ++
+        console.log("player score: "+ player.score )
+        switch(enemy.teamColor){
+
+          // POINT FOR RED TEAM (blue player was hit)
+          case 0:{
+            this.state.redScore ++
+            console.log("incrementing red Score: " + this.state.redScore)
+           
+            // redTeamDoc.update({ 
+            //   score: this.state.redScore
+            // });
+            break
+          }
+          // POINT FOR BLUE TEAM (blue player was hit)
+          case 1:{
+  
+            this.state.blueScore ++
+            console.log("incrementing blue Score: " + this.state.blueScore)
+            // blueTeamDoc.update({  
+            //   score: this.state.blueScore
+            // });
+            break
+          }
+        }
+        this.broadcast("score", {scoreBlue:this.state.blueScore, scoreRed:this.state.redScore })       
+        console.log(message.id, ' was hit!! they were on team: ', enemy.teamColor)
+      }      
     })
 
 
@@ -123,6 +197,12 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.forEach( (player)=>{
       client.send("newPlayerJoined", {id:player.id, color:player.teamColor})
     })
+
+    if(this.state.inMatch){
+      client.send("score", {scoreBlue:this.state.blueScore, scoreRed:this.state.redScore })   
+      client.send("matchIsLive")   
+    }
+    
       
     
   }
@@ -134,7 +214,41 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.delete(client.sessionId)
   }
 
+
+  async saveScores(_blueScore:number, _redScore:number){
+
+    if((_blueScore > 0) || (_redScore > 0)){
+      const res = await this.db.collection('matches').add({
+        timeStamp:  this.state.startTime,
+        blueScore:  _blueScore,
+        redScore:  _redScore           
+      });
+  
+      this.state.players.forEach( (player) =>{
+  
+        console.log('adding player: ', player.name, player.score, player.teamColor, player.wallet)
+  
+        res.collection('players').doc(player.wallet).set({
+          name: player.name ,
+          score: player.score,
+          team :player.teamColor,
+          wallet: player.wallet
+  
+        })
+      });
+    }
+
+  }
+
   onDispose() {
-    console.log('Disposing room...')
+    if(this.state.inMatch){
+      this.saveScores(this.state.blueScore, this.state.redScore)    
+      console.log('Disposing room mid match')
+    }  
+    else{
+      console.log('Disposing room...')
+    }    
+
+    
   }
 }

@@ -14,22 +14,50 @@ const input = Input.instance
 
 // SHOOT
 input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
-        offsetVec.copyFrom(offsetVecOriginal) 
-        throwDir.copyFrom(throwDirOriginal)
-
-        if(player.cam.cameraMode == CameraMode.ThirdPerson){
-            player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
-                                  
+    
+    if(player.matchStarted){
+        if(player.ammo > 0){
+            player.useAmmo()
+            
+            offsetVec.copyFrom(offsetVecOriginal) 
+            throwDir.copyFrom(throwDirOriginal)
+            
+            if(player.cam.cameraMode == CameraMode.ThirdPerson){
+                player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
+                                      
+            }
+            else{
+                player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
+    
+            }
+            player.clipThrow.play(true)
+    
         }
-        else{
-            player.ballManager.spawnBall(player.color).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
-
-        }
-        player.clipThrow.play(true)
+    }
+    
+    
+    
         
         //ball.moveVector.copyFrom(throwDir.rotate(player.rotation))  
        // physicsBall.playerThrow(player.position.add(offsetVec.rotate(player.rotation)),throwDir.rotate(player.rotation), 200)
         //triggerEmote({ predefined: PredefinedEmote.RAISE_HAND })
+})
+
+// HOLD DOWN TO COLLECT SNOW FOR AMMO
+input.subscribe("BUTTON_DOWN", ActionButton.SECONDARY, true, e => {
+       
+    if(player.matchStarted){
+        player.collectAmmo()   
+    }
+             
+    
+})
+
+// COLLECT SNOW FOR AMMO
+input.subscribe("BUTTON_UP", ActionButton.SECONDARY, true, e => {
+       
+        player.stopCollectAmmo()    
+    
 })
 
 // let dummyEnemy = new Entity()

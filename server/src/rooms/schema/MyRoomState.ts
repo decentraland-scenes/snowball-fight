@@ -35,9 +35,20 @@ export class MyRoomState extends Schema {
   @type('number') gameTime: number
   @type('number') blueScore: number = 0
   @type('number') redScore: number = 0
+  @type('boolean') inMatch: boolean = true
+  @type('string') startTime: string = "0"
 
   constructor(time: number = 0){
     super()
     this.gameTime = time
+  }
+
+  resetScores(){
+    this.redScore = 0
+    this.blueScore = 0
+
+    this.players.forEach((player) => {
+      player.score = 0
+    })
   }
 }

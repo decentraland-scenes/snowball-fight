@@ -2,6 +2,7 @@ import { Room } from "node_modules/colyseus.js/lib/Room"
 import { Ball, BallManager } from "./ball"
 import { EnemyManager } from "./enemyManager"
 import { teamColor } from "./teamColors"
+import { updateAmmo } from "./ui"
 
 @Component("SelfCollider")
 export class SelfCollider {     
@@ -18,12 +19,20 @@ export class Player {
     dummyAnimator:Animator
     clipThrow:AnimationState
     clipHit:AnimationState
+    ammo:number = 0
+    maxAmmo:number = 10
+    ammoSys:AmmoTimerSystem
+    matchStarted:boolean = false
     
     roomConnected:boolean = false
     room:Room
+    physicsCastParcel:PhysicsCast
+    isOnDefaultParcel:boolean = false
 
     constructor(color:teamColor){
-        
+
+        this.physicsCastParcel = PhysicsCast.instance
+
         this.id = "0x0"
         this.cam = Camera.instance
         this.collider = new Entity()        
@@ -55,6 +64,10 @@ export class Player {
         this.clipHit.looping = false
         this.clipThrow.looping = false
 
+        this.isOnDefaultParcel = false
+
+        this.ammoSys = new AmmoTimerSystem(this)
+        engine.addSystem(this.ammoSys)
 
         
         // this.sendDataSys = new SendPlayerDataSystem(this)
@@ -66,6 +79,18 @@ export class Player {
     }
     addEnemyManager(_enemyManager:EnemyManager){
         this.enemyManager = _enemyManager
+    }
+    useAmmo(){
+        if(this.roomConnected){
+            this.ammo -=1
+
+            if(this.ammo < 0){
+                this.ammo = 0
+            }
+    
+            updateAmmo(this.ammo, this.maxAmmo)
+        }
+        
     }
 
     setColor(_teamColor:number){
@@ -87,9 +112,78 @@ export class Player {
     getHorizontalRotation():Quaternion{        
         return Quaternion.FromToRotation(Vector3.Forward(), Vector3.Forward().rotate(this.cam.rotation).multiplyByFloats(1,0,1))
     }
+    collectAmmo(){        
+        this.ammoSys.isActive = true
+    }
+    stopCollectAmmo(){        
+        this.ammoSys.isActive = false
+    }
+    checkDefaultParcel(){
+
+        let result = false
+
+        let rayDown: Ray = {
+            origin: this.cam.position,
+            direction: Vector3.Down(),
+            distance: 3,
+        }
+
+        this.physicsCastParcel.hitFirst(
+            rayDown,
+            (e) => {
+            if(e.didHit){                
+                //log("player Standing on : " + e.entity.meshName)
+                //
+                if(e.entity.meshName.substring(0,3) == "EP_"){
+                   // log("player is on default parcel")
+                    this.isOnDefaultParcel = true
+                }
+                else{
+                    this.isOnDefaultParcel = false
+                }
+            }
+        })
+
+            
+    }
 }
 
+
+
+class AmmoTimerSystem {
+    isActive:boolean = false
+    elapsed:number = 0
+    cooldown:number = 1
+    
+    playerRef:Player
+
+    constructor(_player:Player){
+       this.playerRef = _player
+    }
+    
+    update(dt:number){
+
+        if(this.isActive){           
+
+            if(this.elapsed < this.cooldown){
+                this.elapsed += dt
+            }
+            else{
+                if(this.playerRef.isOnDefaultParcel){
+                    if(this.playerRef.ammo < this.playerRef.maxAmmo){
+                        this.playerRef.ammo ++
+                        log("AMMO: " + this.playerRef.ammo +"/" + this.playerRef.maxAmmo)
+                        updateAmmo(this.playerRef.ammo, this.playerRef.maxAmmo)
+                    }
+                    
+                }
+                this.elapsed = 0
+                
+            }
+        }
+
+    }
+}
+
+
 export let player = new Player(teamColor.BLUE)
-
-
-
