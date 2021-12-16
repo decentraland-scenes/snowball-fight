@@ -20,7 +20,7 @@ export async function connect(roomName: string, options: any = {}) {
   const isPreview = await isPreviewMode()
   const realm = await getCurrentRealm()
 
-   //
+  //
   //CHANGE THIS FOR EACH SIDE'S WEARABLES
   //
   options.color = teamColor.BLUE
@@ -36,7 +36,7 @@ export async function connect(roomName: string, options: any = {}) {
 
   log('USER DATA:', options.userData)
 
-   //   const ENDPOINT = 'wss://e8f99g.us-east-vin.colyseus.net'
+  //   const ENDPOINT = 'wss://e8f99g.us-east-vin.colyseus.net'
   const ENDPOINT = isPreview
     ? 'ws://127.0.0.1:2567' // local environment
     : 'wss://e8f99g.us-east-vin.colyseus.net' // production environment
@@ -56,7 +56,7 @@ export async function connect(roomName: string, options: any = {}) {
     room = await client.joinOrCreate<any>(roomName, options)
 
     // if (isPreview) {
-    updateConnectionDebugger(room)
+    updateConnectionDebugger(room, isPreview)
     // }
 
     log('Connected!')
@@ -64,8 +64,14 @@ export async function connect(roomName: string, options: any = {}) {
 
     return room
   } catch (e: any) {
-   // updateConnectionMessage(`Error: ${e.message}`, Color4.Red())
-    setServerStatusUI(`Connecting to ${e.message}`, Color4.Red())
+    if (isPreview) {
+      updateConnectionMessage(`Error: ${e.message}`, Color4.Red())
+    } else {
+      updateConnectionMessage(
+        '-- Snowball fight outfit offline -- \n Try taking it off and putting it back on again',
+        Color4.Red()
+      )
+    }
     throw e
   }
 }
@@ -83,19 +89,27 @@ function addConnectionDebugger(endpoint: string, isPreview: boolean) {
 
   if (isPreview) {
     updateConnectionMessage(`Connecting to ${endpoint}`, Color4.White())
-    
   }
 }
 
 function updateConnectionMessage(value: string, color: Color4) {
+  message.visible = true
   message.value = value
   message.color = color
 }
 
-function updateConnectionDebugger(room: Room) {
-  updateConnectionMessage('Connected.', Color4.Green())
-  setServerStatusUI(' CONNECTED', Color4.Green())
-  room.onLeave(() => updateConnectionMessage('Connection lost', Color4.Red()))
+function updateConnectionDebugger(room: Room, isPreview?: boolean) {
+  if (isPreview) {
+    updateConnectionMessage('Connected.', Color4.Green())
+  } else {
+    message.visible = false
+  }
+  room.onLeave(() =>
+    updateConnectionMessage(
+      '-- Xmas Vision glasses offline -- \n Try taking them off and putting them back on again',
+      Color4.Red()
+    )
+  )
 }
 
 // //
@@ -142,7 +156,6 @@ function updateConnectionDebugger(room: Room) {
 //   }
 //   options.userData = userData
 
-
 //   log('data sent:', options)
 
 //   // const ENDPOINT = "wss://hept-j.colyseus.dev";
@@ -168,7 +181,7 @@ function updateConnectionDebugger(room: Room) {
 //   } catch (e) {
 //     //updateConnectionMessage(`Error: ${e.message}`, Color4.Red())
 //     setServerStatusUI(`Connecting to ${e.message}`, Color4.Red())
-    
+
 //     throw e
 //   }
 // }
@@ -198,12 +211,3 @@ function updateConnectionDebugger(room: Room) {
 //   setServerStatusUI(' CONNECTED', Color4.Green())
 //   room.onLeave(() => updateConnectionMessage('Connection lost', Color4.Red()))
 // }
-
-
-
-
-
-
-
-
-
