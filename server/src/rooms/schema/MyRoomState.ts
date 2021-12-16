@@ -37,6 +37,8 @@ export class MyRoomState extends Schema {
   @type('number') redScore: number = 0
   @type('boolean') inMatch: boolean = true
   @type('string') startTime: string = "0"
+  @type('string') server: string = "preview"
+  @type('string') island: string = "preview"
 
   constructor(time: number = 0){
     super()

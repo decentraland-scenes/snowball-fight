@@ -6,7 +6,7 @@ import { serviceAccount } from '../firebase/firebase_api'
 
 /////
 /////
-//TESTING WITHOUT FIREBASE: REMOVE OR SET TRUE FOR PROD
+//TESTING WITHOUT FIREBASE: SET TRUE FOR PROD
 const WITH_FIREBASE_SAVING = false
 /////
 /////
@@ -38,6 +38,7 @@ export class MyRoom extends Room<MyRoomState> {
     //
 
   }
+  // GAME SERVER LOOP
   update(dt:number){
 
     if(this.state.inMatch){
@@ -84,6 +85,15 @@ export class MyRoom extends Room<MyRoomState> {
 
   onCreate(options: any) {
     this.setState(new MyRoomState())
+
+    if(options.realm){
+      this.state.server = options.realm
+    }
+    if(options.room){
+      this.state.island = options.room
+    }
+    
+    
 
     //SCORE DATABASE SETUP
     if(WITH_FIREBASE_SAVING){
@@ -225,16 +235,31 @@ export class MyRoom extends Room<MyRoomState> {
   }
 
 
+  // SAVE SCORES TO FIREBASE SERVER
   async saveScores(_blueScore:number, _redScore:number){
 
     if(WITH_FIREBASE_SAVING){
 
       if((_blueScore > 0) || (_redScore > 0)){
-        const res = await this.db.collection('matches').add({
+
+        const matchId = (this.state.startTime + "-" + this.state.server + "-" + this.state.island)
+
+        const write = await this.db.collection('matches').doc(matchId).set({
           timeStamp:  this.state.startTime,
           blueScore:  _blueScore,
-          redScore:  _redScore           
+          redScore:  _redScore,
+          server: this.state.server,
+          island: this.state.island
+
         });
+
+        const res =  this.db.collection('matches').doc(matchId)
+
+        // const res = await this.db.collection('matches').add({
+        //   timeStamp:  this.state.startTime,
+        //   blueScore:  _blueScore,
+        //   redScore:  _redScore           
+        // });
     
         this.state.players.forEach( (player) =>{
     
