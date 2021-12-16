@@ -28,6 +28,7 @@ export class Player {
     room:Room
     physicsCastParcel:PhysicsCast
     isOnDefaultParcel:boolean = false
+    inCooldown:boolean = false
 
     constructor(color:teamColor){
 
@@ -82,13 +83,15 @@ export class Player {
     }
     useAmmo(){
         if(this.roomConnected){
+                         
             this.ammo -=1
 
             if(this.ammo < 0){
                 this.ammo = 0
             }
-    
+            player.inCooldown = true
             updateAmmo(this.ammo, this.maxAmmo)
+            
         }
         
     }
@@ -187,3 +190,28 @@ class AmmoTimerSystem {
 
 
 export let player = new Player(teamColor.BLUE)
+
+export class SnowballCooldownSystem{    
+    elapsed:number = 0  
+    cooldown:number = 0.75
+  
+    update(dt:number){  
+  
+        if(player.inCooldown){
+          //log("elapsed: " + cooldownInfo.elapsed)
+          if(this.elapsed < this.cooldown){
+            this.elapsed += dt
+            //cooldownInfo.inCooldown = true
+          }
+          else{
+           // log("TIMESUP: " + cooldownInfo.elapsed)
+            //log("elapsed: " + cooldownInfo.elapsed)
+            this.elapsed = 0
+            player.inCooldown = false
+  
+          }
+        }  
+    }
+  }
+  
+  engine.addSystem(new SnowballCooldownSystem())

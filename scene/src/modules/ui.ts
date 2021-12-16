@@ -6,32 +6,6 @@
 export const canvas = new UICanvas()
 
 
-//Kick force marker
-export let kickforceContainer = new UIContainerRect(canvas)
-kickforceContainer.height = 64
-kickforceContainer.hAlign = 'center'
-kickforceContainer.vAlign = 'center'
-kickforceContainer.width = 64
-kickforceContainer.positionY = "5.55%" 
-
-
-export let kickforceImage = new UIImage(kickforceContainer, kickForceTexture)
-kickforceImage.width = '40px'
-kickforceImage.height = '43px'
-kickforceImage.sourceLeft = 0*64
-kickforceImage.sourceTop = 0
-kickforceImage.sourceWidth = 64
-kickforceImage.sourceHeight = 64
-kickforceImage.hAlign = 'center'
-kickforceImage.vAlign = 'center' 
-
-export function setKickForceUI(_level:number){
-
-    kickforceImage.sourceLeft = _level*64
-    kickforceContainer.hAlign = 'center'
-}
-setKickForceUI(0)
-
 
 // TOP EDGE - SCORES CONTAINER
 let TopScoresContainer = new UIContainerRect(canvas)
@@ -49,7 +23,7 @@ export let MatchTimeContainer = new UIContainerRect(TopScoresContainer)
     MatchTimeContainer.hAlign = 'center'
     MatchTimeContainer.vAlign = 'bottom'
     MatchTimeContainer.width = '16%'
-    MatchTimeContainer.positionY = 12
+    MatchTimeContainer.positionY = 20
     MatchTimeContainer.color = Color4.FromHexString(`#00000088`)
 
 export let MatchTimerMessage = new UIText(MatchTimeContainer)
@@ -61,6 +35,7 @@ export let MatchTimerMessage = new UIText(MatchTimeContainer)
     MatchTimerMessage.hAlign = 'center'
     MatchTimerMessage.hTextAlign = 'center'
     MatchTimerMessage.vTextAlign = 'center'
+    MatchTimerMessage.positionY = -2
     MatchTimerMessage.textWrapping = true
 
 export function updateGameTime(_timeInSeconds:number){
@@ -310,36 +285,37 @@ export function setServerStatusUI(text:string, _color?:Color4) {
 
 
 export const CursorMessageContainer = new UIContainerRect(canvas)
-CursorMessageContainer.visible = false
-CursorMessageContainer.width = '20%'
-CursorMessageContainer.height = '12%'
+CursorMessageContainer.visible = true
+CursorMessageContainer.width = '25%'
+CursorMessageContainer.height = '10%'
 CursorMessageContainer.vAlign = 'center'
 CursorMessageContainer.hAlign = 'center'
-CursorMessageContainer.positionY= '35%'
+CursorMessageContainer.positionY= '42%'
 CursorMessageContainer.color = Color4.FromHexString(`#000000bb`)
 
 export const CursorMessageTitle = new UIText(CursorMessageContainer)
 CursorMessageTitle.value = "TEAMS ARE READY!"
 CursorMessageTitle.width = '100%'
-CursorMessageTitle.height = '30%'
+CursorMessageTitle.height = '20%'
 //CursorMessageTitle.positionY = '30%'
 CursorMessageTitle.vAlign = 'top'
 CursorMessageTitle.hAlign = 'center'
 CursorMessageTitle.hTextAlign = 'center'
 CursorMessageTitle.vTextAlign = 'center'
-CursorMessageTitle.fontSize = 16
+CursorMessageTitle.fontSize = 14
+CursorMessageTitle.positionY = -5
 CursorMessageTitle.color = Color4.White()
 
 export const CursorMessage = new UIText(CursorMessageContainer)
 CursorMessage.value = "5"
 CursorMessage.width = '100%'
 CursorMessage.height = '30%'
-CursorMessage.positionY = '-5%'
+CursorMessage.positionY = '-7%'
 CursorMessage.vAlign = 'center'
 CursorMessage.hAlign = 'center'
 CursorMessage.hTextAlign = 'center'
 CursorMessage.vTextAlign = 'center'
-CursorMessage.fontSize = 32
+CursorMessage.fontSize = 24
 CursorMessage.color = Color4.Yellow()
 CursorMessage.outlineColor = Color4.Yellow()
 CursorMessage.outlineWidth = 0.2
@@ -369,22 +345,23 @@ serverMessage.outlineColor = Color4.Yellow()
 serverMessage.outlineWidth = 0.2
 
 export const InstructionContainer = new UIContainerRect(canvas)
-InstructionContainer.visible = false
+InstructionContainer.visible = true
 InstructionContainer.width = '22%'
-InstructionContainer.height = '8%'
+InstructionContainer.height = '6%'
 InstructionContainer.vAlign = 'bottom'
-InstructionContainer.hAlign = 'right'
-InstructionContainer.positionY = '8%'
+InstructionContainer.hAlign = 'center'
+InstructionContainer.positionY = '12%'
 InstructionContainer.color = Color4.FromHexString(`#00000088`)
 
 export const instructionMessage = new UIText(InstructionContainer)
-instructionMessage.value = "- Hold mouse button for stronger kick\n- Can press even before you're near the ball"
+instructionMessage.value = `Hold 'F' to make snowballs (on empty parcels)\n`
+
 instructionMessage.width = '100%'
 instructionMessage.height = '30%'
-instructionMessage.positionY = '-5%'
+instructionMessage.positionY = '-2%'
 instructionMessage.vAlign = 'center'
 instructionMessage.hAlign = 'center'
-instructionMessage.hTextAlign = 'left'
+instructionMessage.hTextAlign = 'center'
 instructionMessage.vTextAlign = 'center'
 instructionMessage.paddingLeft = 12
 instructionMessage.fontSize = 12
@@ -496,5 +473,5 @@ class CursorMessageTimeout{
   
   }
 
-  let cursorTimeoutSys = new CursorMessageTimeout(3)
+  let cursorTimeoutSys = new CursorMessageTimeout(1)
   engine.addSystem(cursorTimeoutSys)

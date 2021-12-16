@@ -4,6 +4,14 @@ import  { initializeApp, applicationDefault, cert } from '../../node_modules/fir
 import { getFirestore, Timestamp, FieldValue } from '../../node_modules/firebase-admin/lib/firestore'
 import { serviceAccount } from '../firebase/firebase_api'
 
+/////
+/////
+//TESTING WITHOUT FIREBASE: REMOVE OR SET TRUE FOR PROD
+const WITH_FIREBASE_SAVING = false
+/////
+/////
+/////
+
 export class MyRoom extends Room<MyRoomState> {
 
   public matchIntervalLoop!: Delayed;
@@ -76,20 +84,22 @@ export class MyRoom extends Room<MyRoomState> {
 
   onCreate(options: any) {
     this.setState(new MyRoomState())
+
     //SCORE DATABASE SETUP
-    var admin = require("firebase-admin");
+    if(WITH_FIREBASE_SAVING){
+      var admin = require("firebase-admin");
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
-
-    this.db = getFirestore();
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+  
+      this.db = getFirestore();
+    }
+    
     
     //this.state.startTime = this.clock.currentTime
     this.state.startTime = new Date().toISOString()
-    //const playerLeaderboard = db.collection('scores').doc('leaderboard');
-    const redTeamDoc = this.db.collection('teams').doc('redTeam');
-    const blueTeamDoc =this.db.collection('teams').doc('blueTeam');
+   
     
     //update time every 1 second
     this.setSimulationInterval((deltaTime) => this.update(deltaTime), 1000);
@@ -217,26 +227,30 @@ export class MyRoom extends Room<MyRoomState> {
 
   async saveScores(_blueScore:number, _redScore:number){
 
-    if((_blueScore > 0) || (_redScore > 0)){
-      const res = await this.db.collection('matches').add({
-        timeStamp:  this.state.startTime,
-        blueScore:  _blueScore,
-        redScore:  _redScore           
-      });
-  
-      this.state.players.forEach( (player) =>{
-  
-        console.log('adding player: ', player.name, player.score, player.teamColor, player.wallet)
-  
-        res.collection('players').doc(player.wallet).set({
-          name: player.name ,
-          score: player.score,
-          team :player.teamColor,
-          wallet: player.wallet
-  
-        })
-      });
+    if(WITH_FIREBASE_SAVING){
+
+      if((_blueScore > 0) || (_redScore > 0)){
+        const res = await this.db.collection('matches').add({
+          timeStamp:  this.state.startTime,
+          blueScore:  _blueScore,
+          redScore:  _redScore           
+        });
+    
+        this.state.players.forEach( (player) =>{
+    
+          console.log('adding player: ', player.name, player.score, player.teamColor, player.wallet)
+    
+          res.collection('players').doc(player.wallet).set({
+            name: player.name ,
+            score: player.score,
+            team :player.teamColor,
+            wallet: player.wallet
+    
+          })
+        });
+      }
     }
+    
 
   }
 

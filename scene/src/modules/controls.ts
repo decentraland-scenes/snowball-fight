@@ -2,6 +2,7 @@
 import { BallManager } from "./ball"
 import { triggerEmote, PredefinedEmote,  } from "@decentraland/RestrictedActions"
 import { player } from "./player"
+import { DisplayCursorMessage, DisplayServerMessage } from "./ui"
 
 //let player = Camera.instance
 
@@ -16,22 +17,24 @@ const input = Input.instance
 input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
     
     if(player.matchStarted){
-        if(player.ammo > 0){
-            player.useAmmo()
-            
-            offsetVec.copyFrom(offsetVecOriginal) 
-            throwDir.copyFrom(throwDirOriginal)
-            
-            if(player.cam.cameraMode == CameraMode.ThirdPerson){
-                player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
-                                      
+        if(!player.inCooldown){   
+            if(player.ammo > 0){
+                player.useAmmo()
+                
+                offsetVec.copyFrom(offsetVecOriginal) 
+                throwDir.copyFrom(throwDirOriginal)
+                
+                if(player.cam.cameraMode == CameraMode.ThirdPerson){
+                    player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position.add(offsetVec.rotate(player.cam.rotation)),throwDir.rotate(player.cam.rotation),1)
+                                        
+                }
+                else{
+                    player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
+        
+                }
+                player.clipThrow.play(true)
+        
             }
-            else{
-                player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
-    
-            }
-            player.clipThrow.play(true)
-    
         }
     }
     
@@ -48,6 +51,9 @@ input.subscribe("BUTTON_DOWN", ActionButton.SECONDARY, true, e => {
        
     if(player.matchStarted){
         player.collectAmmo()   
+    }
+    else{
+        DisplayCursorMessage('NO CRAFTING YET!', "Wait for the next game", 0.5)
     }
              
     
