@@ -1,0 +1,60 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Source = void 0;
+const validation_1 = require("../../validation");
+/** @alpha */
+var Source;
+(function (Source) {
+    Source.schema = {
+        type: 'object',
+        properties: {
+            version: {
+                type: 'number',
+                nullable: true
+            },
+            origin: {
+                type: 'string'
+            },
+            projectId: {
+                type: 'string'
+            },
+            point: {
+                type: 'object',
+                properties: {
+                    x: { type: 'integer' },
+                    y: { type: 'integer' }
+                },
+                additionalProperties: false,
+                nullable: true,
+                required: ['x', 'y']
+            },
+            rotation: {
+                type: 'string',
+                enum: ['north', 'east', 'south', 'west'],
+                nullable: true
+            },
+            layout: {
+                type: 'object',
+                properties: {
+                    rows: {
+                        type: 'integer'
+                    },
+                    cols: {
+                        type: 'integer'
+                    }
+                },
+                nullable: true,
+                additionalProperties: false,
+                required: ['rows', 'cols']
+            },
+            isEmpty: {
+                type: 'boolean',
+                nullable: true
+            }
+        },
+        additionalProperties: false,
+        required: ['origin', 'projectId']
+    };
+    Source.validate = (0, validation_1.generateValidator)(Source.schema);
+})(Source = exports.Source || (exports.Source = {}));
+//# sourceMappingURL=source.js.map

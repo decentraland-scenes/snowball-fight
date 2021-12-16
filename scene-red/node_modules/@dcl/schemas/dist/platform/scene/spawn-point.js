@@ -1,0 +1,65 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpawnPoint = void 0;
+const validation_1 = require("../../validation");
+/** @alpha */
+var SpawnPoint;
+(function (SpawnPoint) {
+    SpawnPoint.schema = {
+        type: 'object',
+        properties: {
+            name: {
+                type: 'string',
+                nullable: true
+            },
+            position: {
+                type: 'object',
+                oneOf: [{ $ref: '#single-position' }, { $ref: '#multi-position' }],
+                required: ['x', 'y', 'z']
+            },
+            default: {
+                type: 'boolean',
+                nullable: true
+            },
+            cameraTarget: {
+                type: 'object',
+                properties: {
+                    x: { type: 'number' },
+                    y: { type: 'number' },
+                    z: { type: 'number' }
+                },
+                additionalProperties: false,
+                required: ['x', 'y', 'z'],
+                nullable: true
+            }
+        },
+        additionalProperties: false,
+        required: ['position'],
+        definitions: {
+            'single-position': {
+                $id: '#single-position',
+                type: 'object',
+                properties: {
+                    x: { type: 'number' },
+                    y: { type: 'number' },
+                    z: { type: 'number' }
+                },
+                additionalProperties: false,
+                required: ['x', 'y', 'z']
+            },
+            'multi-position': {
+                $id: '#multi-position',
+                type: 'object',
+                properties: {
+                    x: { type: 'array', items: { type: 'number' }, minItems: 1 },
+                    y: { type: 'array', items: { type: 'number' }, minItems: 1 },
+                    z: { type: 'array', items: { type: 'number' }, minItems: 1 }
+                },
+                additionalProperties: false,
+                required: ['x', 'y', 'z']
+            }
+        }
+    };
+    SpawnPoint.validate = (0, validation_1.generateValidator)(SpawnPoint.schema);
+})(SpawnPoint = exports.SpawnPoint || (exports.SpawnPoint = {}));
+//# sourceMappingURL=spawn-point.js.map
