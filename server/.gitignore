@@ -39,6 +39,8 @@ build/Release
 
 # Dependency directories
 node_modules/
+scene-blue/node_modules/
+scene-red/node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
