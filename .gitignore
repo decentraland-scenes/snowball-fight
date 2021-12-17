@@ -38,6 +38,7 @@ scene-red/bin
 server/bin
 server/lib
 
+
 server/src/firebase
 
 # Dependency directories
