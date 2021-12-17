@@ -33,6 +33,8 @@ bower_components
 build/Release
 
 scene/bin
+scene-blue/bin
+scene-red/bin
 server/bin
 server/lib
 
@@ -40,6 +42,8 @@ server/src/firebase
 
 # Dependency directories
 scene/node_modules/
+scene-blue/node_modules/
+scene-red/node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
