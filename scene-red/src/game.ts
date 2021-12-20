@@ -23,6 +23,8 @@ export class ConnectSystem implements ISystem {
       } else {
         this.connected = true
         this.checking = false
+        currentRealm = realm.displayName
+        currentRoom = realm.room
         log('CONNECTING TO WS SERVER')
         await connect('my_room').then(async (room: Room) => {
           onConnect(room)
@@ -42,8 +44,18 @@ export class ConnectSystem implements ISystem {
 let myConnectSystem = new ConnectSystem()
 engine.addSystem(myConnectSystem)
 
+let currentRealm: string | null = null
+let currentRoom: string | null = null
+
 onRealmChangedObservable.add(async (realmData) => {
   if (realmData && realmData.room) {
+    if (
+      realmData.displayName === currentRealm &&
+      realmData.room === currentRoom
+    ) {
+      log('SAME ISLAND AS BEFORE')
+      return
+    }
     log('PLAYER CHANGED ISLAND TO ', realmData.room)
     myConnectSystem.connected = true
     log('CONNECTING TO WS SERVER')
