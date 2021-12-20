@@ -17,6 +17,8 @@ import { setServerStatusUI } from './modules/ui'
 export let room: Room | undefined = undefined
 
 export async function connect(roomName: string, options: any = {}) {
+  disconnect()
+
   const isPreview = await isPreviewMode()
   const realm = await getCurrentRealm()
 
@@ -110,6 +112,13 @@ function updateConnectionDebugger(room: Room, isPreview?: boolean) {
       Color4.Red()
     )
   )
+}
+
+export function disconnect() {
+  if (room !== undefined) {
+    room.removeAllListeners()
+    room.leave()
+  }
 }
 
 // //

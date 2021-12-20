@@ -3,6 +3,7 @@
     "outFile": "./bin/game.js",
     "allowJs": true,
     "strict": true,
+	"noLib": false,
     "paths": {
       "colyseus.js": [
         "node_modules\\colyseus.js\\dist\\colyseus.d.ts",
