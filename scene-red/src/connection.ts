@@ -19,13 +19,14 @@ export let room: Room | undefined = undefined
 export async function connect(roomName: string, options: any = {}) {
   disconnect()
 
-  const isPreview = await isPreviewMode()
+  //const isPreview = await isPreviewMode()
+  const isPreview = false
   const realm = await getCurrentRealm()
 
   //
   //CHANGE THIS FOR EACH SIDE'S WEARABLES
   //
-  options.color = teamColor.BLUE
+  options.color = teamColor.RED
 
   //   if (!realm?.room) return
   //
@@ -38,10 +39,10 @@ export async function connect(roomName: string, options: any = {}) {
 
   log('USER DATA:', options.userData)
 
-  //   const ENDPOINT = 'wss://e8f99g.us-east-vin.colyseus.net'
-  const ENDPOINT = isPreview
-    ? 'ws://127.0.0.1:2567' // local environment
-    : 'wss://e8f99g.us-east-vin.colyseus.net' // production environment
+     const ENDPOINT = 'wss:xggtls.colyseus.dev'
+  // const ENDPOINT = isPreview
+  //   ? 'ws://127.0.0.1:2567' // local environment
+  //   : 'wss:xggtls.colyseus.dev' // production environment
 
   addConnectionDebugger(ENDPOINT, isPreview)
 

@@ -1,3 +1,4 @@
+import { triggerEmote, PredefinedEmote } from '@decentraland/RestrictedActions'
 import { Room } from 'colyseus.js'
 import { Ball, BallManager } from './ball'
 import { EnemyManager } from './enemyManager'
@@ -14,10 +15,10 @@ export class Player {
   enemyManager: EnemyManager
   cam: Camera
   color: teamColor = teamColor.BLUE
-  testDummy: Entity
-  dummyAnimator: Animator
-  clipThrow: AnimationState
-  clipHit: AnimationState
+  //testDummy: Entity
+  //dummyAnimator: Animator
+  //clipThrow: AnimationState
+  //clipHit: AnimationState
   ammo: number = 0
   maxAmmo: number = 10
   ammoSys: AmmoTimerSystem
@@ -30,6 +31,7 @@ export class Player {
   inCooldown: boolean = false
 
   constructor(color: teamColor) {
+    this.color = color
     this.physicsCastParcel = PhysicsCast.instance
 
     this.id = '0x0'
@@ -40,9 +42,18 @@ export class Player {
         position: new Vector3(0, 0, 0),
       })
     )
-    this.collider.addComponent(
-      new GLTFShape('models/enemy.glb')
-    ).isPointerBlocker = false
+    if(color == teamColor.BLUE){
+      this.collider.addComponent(
+        new GLTFShape('models/self_marker_blue.glb')
+      ).isPointerBlocker = false
+    }
+    else{
+      this.collider.addComponent(
+        new GLTFShape('models/self_marker_red.glb')
+      ).isPointerBlocker = false
+    }
+
+   
     this.collider.addComponent(new SelfCollider())
 
     engine.addEntity(this.collider)
@@ -50,24 +61,24 @@ export class Player {
     this.collider.setParent(Attachable.AVATAR)
 
     //animation testing
-    this.testDummy = new Entity()
-    this.testDummy.addComponent(
-      new Transform({ position: new Vector3(0, -1.0, 0) })
-    )
-    engine.addEntity(this.testDummy)
-    this.testDummy.setParent(Attachable.AVATAR)
-    this.testDummy.addComponent(new GLTFShape('models/snowball_anim.glb'))
+    // this.testDummy = new Entity()
+    // this.testDummy.addComponent(
+    //   new Transform({ position: new Vector3(0, -1.0, 0) })
+    // )
+    // engine.addEntity(this.testDummy)
+    // this.testDummy.setParent(Attachable.AVATAR)
+    // this.testDummy.addComponent(new GLTFShape('models/snowball_anim.glb'))
 
-    this.dummyAnimator = new Animator()
-    this.clipThrow = new AnimationState('Snowball_Throw')
-    this.clipHit = new AnimationState('Snowball_Hit')
+    // this.dummyAnimator = new Animator()
+    // this.clipThrow = new AnimationState('Snowball_Throw')
+    // this.clipHit = new AnimationState('Snowball_Hit')
 
-    this.testDummy.addComponent(this.dummyAnimator)
-    this.dummyAnimator.addClip(this.clipThrow)
-    this.dummyAnimator.addClip(this.clipHit)
+    // this.testDummy.addComponent(this.dummyAnimator)
+    // this.dummyAnimator.addClip(this.clipThrow)
+    // this.dummyAnimator.addClip(this.clipHit)
 
-    this.clipHit.looping = false
-    this.clipThrow.looping = false
+    // this.clipHit.looping = false
+    // this.clipThrow.looping = false
 
     this.isOnDefaultParcel = false
 
@@ -120,6 +131,7 @@ export class Player {
   }
   collectAmmo() {
     this.ammoSys.isActive = true
+    triggerEmote({ predefined: PredefinedEmote.CRAFTING })
   }
   stopCollectAmmo() {
     this.ammoSys.isActive = false
@@ -163,7 +175,8 @@ class AmmoTimerSystem {
     if (this.isActive) {
       if (this.elapsed < this.cooldown) {
         this.elapsed += dt
-      } else {
+      } 
+      else {
         if (this.playerRef.isOnDefaultParcel) {
           if (this.playerRef.ammo < this.playerRef.maxAmmo) {
             this.playerRef.ammo++
@@ -172,6 +185,7 @@ class AmmoTimerSystem {
           }
         }
         this.elapsed = 0
+        triggerEmote({ predefined: PredefinedEmote.CRAFTING })
       }
     }
   }

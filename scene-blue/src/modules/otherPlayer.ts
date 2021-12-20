@@ -24,42 +24,44 @@ export class OtherPlayer {
     dummyAnimator:Animator
     clipThrow:AnimationState
     clipHit:AnimationState
+    targetTransform:Transform
 
     constructor(id:string, color:teamColor){
 
         this.id = id
         this.material = new Material()
         this.collider = new Entity()  
+        this.collider.addComponent(new Transform({
+            position: new Vector3(0,0,0)
+        }))
+
+        this.targetTransform = new Transform()
 
         switch(color){
             case teamColor.BLUE:{
                 this.material.albedoColor = Color4.Blue()
                 this.collider.addComponent(new OtherCollider(teamColor.BLUE, this.id))
+                this.collider.addComponent(new GLTFShape('models/enemy_blue.glb')).isPointerBlocker = true
                 break
             }
             case teamColor.RED: {
                 this.material.albedoColor = Color4.Red()
                 this.collider.addComponent(new OtherCollider(teamColor.RED, this.id))
+                this.collider.addComponent(new GLTFShape('models/enemy_red.glb')).isPointerBlocker = true
                 break
             }
-            default : {
-                this.material.albedoColor = Color4.Blue()
-                this.collider.addComponent(new OtherCollider(teamColor.BLUE, this.id))
-                teamColor.BLUE
-            }
+            
         }
         
         
 
               
-        this.collider.addComponent(new Transform({
-            position: new Vector3(0,0,0)
-        }))
-        this.collider.addComponent(new GLTFShape('models/enemy.glb')).isPointerBlocker = true
+       
+        
        // this.collider.addComponent(new BoxShape())
        // this.collider.addComponent(new GLTFShape('models/snowball_anim.glb'))
         
-        this.collider.addComponent(this.material)
+        //this.collider.addComponent(this.material)
 
         engine.addEntity(this.collider)
 
@@ -107,8 +109,11 @@ export class OtherPlayer {
     }
     updatePos(posX:number, posY:number, posZ:number, rotX:number, rotY:number, rotZ:number, rotW:number){
         const transform = this.collider.getComponent(Transform)
-        transform.position.set(posX, posY, posZ)
-        transform.rotation.set(rotX, rotY, rotZ, rotW)
+
+        this.targetTransform.position.set(posX, posY, posZ)
+        this.targetTransform.rotation.set(rotX, rotY, rotZ, rotW)
+       // transform.position.set(posX, posY, posZ)
+      //  transform.rotation.set(rotX, rotY, rotZ, rotW)
     }
 }
 

@@ -32,8 +32,9 @@ input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
                     player.ballManager.spawnBall(player.color, true).throwBallPlayer(player.cam.position,throwDir.rotate(player.cam.rotation),1)
         
                 }
-                player.clipThrow.play(true)
-        
+               // player.clipThrow.play(true)
+                //TODO:
+                triggerEmote({ predefined: PredefinedEmote.SNOWBALLTHROW })
             }
         }
     }

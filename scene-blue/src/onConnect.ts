@@ -4,7 +4,7 @@ import { teamColor } from './modules/teamColors'
 import { connect } from './connection'
 import { BallManager } from './modules/ball'
 import { player, Player } from './modules/player'
-import { EnemyManager } from './modules/enemyManager'
+import { EnemyManager, EnemyUpdateSystem } from './modules/enemyManager'
 import * as ui from './modules/ui'
 import { Room } from 'colyseus.js'
 
@@ -12,6 +12,8 @@ export async function onConnect(room: Room) {
   player.addBallManager(new BallManager(100, room))
   player.setRoom(room)
   player.addEnemyManager(new EnemyManager())
+
+  engine.addSystem(new EnemyUpdateSystem(player.enemyManager))
 
   // REMOVE: add cones
   let blueCone = new Cone(
@@ -63,7 +65,17 @@ export async function onConnect(room: Room) {
   room.onMessage('newPlayerJoined', (data) => {
     log('new player JOINED: ' + data.id, +': ' + data.color)
 
-    player.enemyManager.addEnemy(data.id, teamColor.BLUE)
+    switch(data.color){
+      case 0:
+        {
+          player.enemyManager.addEnemy(data.id, teamColor.BLUE)
+        }
+      case 1:
+        {
+          player.enemyManager.addEnemy(data.id, teamColor.RED)
+        }
+    }
+    
   })
 
   //OTHER PLAYER LEAVES THE SERVER ROOM

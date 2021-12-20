@@ -37,3 +37,20 @@ export class EnemyManager {
 
     
 }
+
+export class EnemyUpdateSystem {
+    enemyManagerRef:EnemyManager
+
+    constructor(EnemyManagerRef:EnemyManager){
+        this.enemyManagerRef = EnemyManagerRef
+    }
+
+    update(dt:number){
+        for(let enemy of this.enemyManagerRef.others){
+            const transform = enemy.collider.getComponent(Transform)
+
+            transform.position = Vector3.Lerp(transform.position, enemy.targetTransform.position, 3 *dt)
+            transform.rotation = Quaternion.Slerp(transform.rotation, enemy.targetTransform.rotation, 3*dt)
+        }
+    }
+}

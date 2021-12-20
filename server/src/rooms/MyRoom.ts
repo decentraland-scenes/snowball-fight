@@ -1,7 +1,7 @@
 import { Room, Client, Delayed } from 'colyseus'
 import { cubeColor, MyRoomState, Player, teamColor } from './schema/MyRoomState'
-import  { initializeApp, applicationDefault, cert } from '../../node_modules/firebase-admin/lib/app'
-import { getFirestore, Timestamp, FieldValue } from '../../node_modules/firebase-admin/lib/firestore'
+//import  { initializeApp, applicationDefault, cert } from '../../node_modules/firebase-admin/lib/app'
+//import { getFirestore, Timestamp, FieldValue } from '../../node_modules/firebase-admin/lib/firestore'
 import { serviceAccount } from '../firebase/firebase_api'
 
 /////
@@ -15,9 +15,9 @@ const WITH_FIREBASE_SAVING = false
 export class MyRoom extends Room<MyRoomState> {
 
   public matchIntervalLoop!: Delayed;
-  public roundTime: number = 1000 * 60 * 0.5  
-  public lobbyTime: number = 1000 * 60 * 0.2  
-  private db:FirebaseFirestore.Firestore    
+  public roundTime: number = 1000 * 60 * 5  
+  public lobbyTime: number = 1000 * 60 * 0.5  
+  //private db:FirebaseFirestore.Firestore    
   private matchElapsed:number = 0
   private lobbyElapsed:number = 0
 
@@ -96,15 +96,15 @@ export class MyRoom extends Room<MyRoomState> {
     
 
     //SCORE DATABASE SETUP
-    if(WITH_FIREBASE_SAVING){
-      var admin = require("firebase-admin");
+    // if(WITH_FIREBASE_SAVING){
+    //   var admin = require("firebase-admin");
 
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
+    //   admin.initializeApp({
+    //     credential: admin.credential.cert(serviceAccount)
+    //   });
   
-      this.db = getFirestore();
-    }
+    //   this.db = getFirestore();
+    // }
     
     
     //this.state.startTime = this.clock.currentTime
@@ -197,6 +197,7 @@ export class MyRoom extends Room<MyRoomState> {
       options.userData.userId
     )
     this.state.players.set(client.sessionId, newPlayer)
+    
     switch(options.color){
       case 0:{
         console.log(newPlayer.name, 'joined the BLUE team! => ', options.color, options.userData)
@@ -234,47 +235,52 @@ export class MyRoom extends Room<MyRoomState> {
     this.state.players.delete(client.sessionId)
   }
 
+  sendAllPos(client:Client){
+
+    this.broadcast("positions", {id:client.id }, {except:client})
+  }
+
 
   // SAVE SCORES TO FIREBASE SERVER
   async saveScores(_blueScore:number, _redScore:number){
 
-    if(WITH_FIREBASE_SAVING){
+    // if(WITH_FIREBASE_SAVING){
 
-      if((_blueScore > 0) || (_redScore > 0)){
+    //   if((_blueScore > 0) || (_redScore > 0)){
 
-        const matchId = (this.state.startTime + "-" + this.state.server + "-" + this.state.island)
+    //     const matchId = (this.state.startTime + "-" + this.state.server + "-" + this.state.island)
 
-        const write = await this.db.collection('matches').doc(matchId).set({
-          timeStamp:  this.state.startTime,
-          blueScore:  _blueScore,
-          redScore:  _redScore,
-          server: this.state.server,
-          island: this.state.island
+    //     const write = await this.db.collection('matches').doc(matchId).set({
+    //       timeStamp:  this.state.startTime,
+    //       blueScore:  _blueScore,
+    //       redScore:  _redScore,
+    //       server: this.state.server,
+    //       island: this.state.island
 
-        });
+    //     });
 
-        const res =  this.db.collection('matches').doc(matchId)
+    //     const res =  this.db.collection('matches').doc(matchId)
 
-        // const res = await this.db.collection('matches').add({
-        //   timeStamp:  this.state.startTime,
-        //   blueScore:  _blueScore,
-        //   redScore:  _redScore           
-        // });
+    //     // const res = await this.db.collection('matches').add({
+    //     //   timeStamp:  this.state.startTime,
+    //     //   blueScore:  _blueScore,
+    //     //   redScore:  _redScore           
+    //     // });
     
-        this.state.players.forEach( (player) =>{
+    //     this.state.players.forEach( (player) =>{
     
-          console.log('adding player: ', player.name, player.score, player.teamColor, player.wallet)
+    //       console.log('adding player: ', player.name, player.score, player.teamColor, player.wallet)
     
-          res.collection('players').doc(player.wallet).set({
-            name: player.name ,
-            score: player.score,
-            team :player.teamColor,
-            wallet: player.wallet
+    //       res.collection('players').doc(player.wallet).set({
+    //         name: player.name ,
+    //         score: player.score,
+    //         team :player.teamColor,
+    //         wallet: player.wallet
     
-          })
-        });
-      }
-    }
+    //       })
+    //     });
+    //   }
+    // }
     
 
   }

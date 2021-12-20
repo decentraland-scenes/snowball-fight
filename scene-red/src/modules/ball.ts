@@ -12,6 +12,7 @@ import { player, SelfCollider } from './player'
 import { teamColor } from './teamColors'
 import { Room } from 'colyseus.js'
 import { OtherCollider } from './otherPlayer'
+import { PredefinedEmote, triggerEmote } from '@decentraland/RestrictedActions'
 
 // import { setKickForceUI } from "./ui";
 
@@ -276,7 +277,8 @@ class BallThrowSystem {
                     e.hitPoint.z
                   )
                   ball.onCollide(hitPoint, normal)
-                  player.clipHit.play(true)
+                  triggerEmote({ predefined: PredefinedEmote.SNOWBALLHIT })
+                  //player.clipHit.play(true)
                 }
               }
               //someone else was hit
