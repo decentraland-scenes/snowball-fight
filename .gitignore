@@ -85,3 +85,11 @@ typings/
 
 # FuseBox cache
 .fusebox/
+scene-blue/bin/game.js
+scene-blue/bin/game.js
+scene-blue/bin/game.js.lib
+scene-blue/models/.DS_Store
+scene-red/bin/game.js
+scene-red/bin/game.js.lib
+scene-red/portable-experience.zip
+scene-blue/portable-experience.zip
