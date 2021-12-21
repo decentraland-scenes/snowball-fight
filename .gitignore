@@ -93,3 +93,8 @@ scene-red/bin/game.js
 scene-red/bin/game.js.lib
 scene-red/portable-experience.zip
 scene-blue/portable-experience.zip
+scene-blue/bin/game.js
+scene-blue/bin/game.js.lib
+scene-red/bin/game.js
+scene-red/bin/game.js.lib
+.DS_Store
