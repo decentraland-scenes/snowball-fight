@@ -1,5 +1,7 @@
 import { teamColor } from "src/cones";
 import { OtherPlayer } from "./otherPlayer";
+import { getUserData } from "@decentraland/Identity";
+
 
 export class EnemyManager {
     others:OtherPlayer[]
@@ -38,6 +40,8 @@ export class EnemyManager {
     
 }
 
+
+
 export class EnemyUpdateSystem {
     enemyManagerRef:EnemyManager
 
@@ -55,3 +59,38 @@ export class EnemyUpdateSystem {
     }
 }
 
+const e = new Entity();
+
+const shape = new BoxShape();
+shape.withCollisions = false;
+e.addComponent(shape);
+
+e.addComponent(new Transform({ scale: new Vector3(0.2, 0.2, 0.2) }));
+
+engine.addEntity(e);
+
+getUserData().then((myPlayerId) => {
+  e.addComponentOrReplace(
+    new AttachToAvatar({
+      avatarId: myPlayerId.userId,
+      anchorPointId: AttachToAvatarAnchorPointId.NameTag,
+    })
+  );
+
+  onEnterSceneObservable.add((player) => {
+    if (player.userId !== myPlayerId?.userId) {
+      e.addComponentOrReplace(
+        new AttachToAvatar({
+          avatarId: player.userId,
+          anchorPointId: AttachToAvatarAnchorPointId.RightHand,
+        })
+      );
+    }
+  });
+
+  onLeaveSceneObservable.add((player) => {
+    if (player.userId !== myPlayerId?.userId) {
+      e.removeComponent(AttachToAvatar);
+    }
+  });
+});

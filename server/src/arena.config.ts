@@ -1,5 +1,8 @@
 import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
+//import  { initializeApp, applicationDefault, cert } from '../node_modules/firebase-admin/lib/app'
+
+
 
 /**
  * Import your Room files
@@ -27,6 +30,11 @@ export default Arena({
             res.send("It's time to kick ass and chew bubblegum!");
         });
 
+        
+
+       // const db = getFirestore()       
+        
+        
         /**
          * Bind @colyseus/monitor
          * It is recommended to protect this route with a password.
