@@ -39,10 +39,10 @@ export async function connect(roomName: string, options: any = {}) {
 
   log('USER DATA:', options.userData)
 
-     const ENDPOINT = 'wss:xggtls.colyseus.dev'
-  // const ENDPOINT = isPreview
-  //   ? 'ws://127.0.0.1:2567' // local environment
-  //   : 'wss:xggtls.colyseus.dev' // production environment
+    // const ENDPOINT = 'wss:xggtls.colyseus.dev'
+    const ENDPOINT = isPreview
+      ? 'ws://127.0.0.1:2567' // local environment
+      : 'wss:xggtls.colyseus.dev' // production environment
 
   addConnectionDebugger(ENDPOINT, isPreview)
 

@@ -34,7 +34,7 @@ input.subscribe("BUTTON_DOWN", ActionButton.POINTER, true, e => {
                 }
                // player.clipThrow.play(true)
                 //TODO:
-                triggerEmote({ predefined: PredefinedEmote.SNOWBALLTHROW })
+                triggerEmote({ predefined: 'snowballthrow' as any })
             }
         }
     }

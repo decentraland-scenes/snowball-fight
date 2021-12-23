@@ -10,9 +10,11 @@ export class EnemyManager {
         this.others = []
     }
 
-    addEnemy(id:string, color:teamColor){
-        let enemy = new OtherPlayer(id, color)
+    addEnemy(id:string):OtherPlayer{
+        let enemy = new OtherPlayer(id)
         this.others.push(enemy)
+
+       return enemy
     }
     removeEnemy(id:string){
         let enemy = this.getEnemyByID(id)
@@ -28,12 +30,19 @@ export class EnemyManager {
        
         return result
     }
+    setEnemyColor(_id:string, color:teamColor){
+        let enemy = this.getEnemyByID(_id)
+
+        if(enemy != null){
+            enemy.setColor(color)
+        }
+    }
     updatePlayerPos(_id:string, posX:number, posY:number, posZ:number, rotX:number, rotY:number, rotZ:number, rotW:number){
 
-        let enemy = this.getEnemyByID(_id)
-        if(enemy != null){
-            enemy.updatePos(posX, posY, posZ, rotX, rotY, rotZ, rotW)
-        }
+        // let enemy = this.getEnemyByID(_id)
+        // if(enemy != null){
+        //     enemy.updatePos(posX, posY, posZ, rotX, rotY, rotZ, rotW)
+        // }
         
     }
 
@@ -50,47 +59,15 @@ export class EnemyUpdateSystem {
     }
 
     update(dt:number){
-        for(let enemy of this.enemyManagerRef.others){
-            const transform = enemy.collider.getComponent(Transform)
+        // for(let enemy of this.enemyManagerRef.others){
+        //     const transform = enemy.collider.getComponent(Transform)
 
-            transform.position = Vector3.Lerp(transform.position, enemy.targetTransform.position, 3 *dt)
-            transform.rotation = Quaternion.Slerp(transform.rotation, enemy.targetTransform.rotation, 3*dt)
-        }
+        //     transform.position = Vector3.Lerp(transform.position, enemy.targetTransform.position, 3 *dt)
+        //     transform.rotation = Quaternion.Slerp(transform.rotation, enemy.targetTransform.rotation, 3*dt)
+        // }
     }
 }
 
-const e = new Entity();
 
-const shape = new BoxShape();
-shape.withCollisions = false;
-e.addComponent(shape);
 
-e.addComponent(new Transform({ scale: new Vector3(0.2, 0.2, 0.2) }));
 
-engine.addEntity(e);
-
-getUserData().then((myPlayerId) => {
-  e.addComponentOrReplace(
-    new AttachToAvatar({
-      avatarId: myPlayerId.userId,
-      anchorPointId: AttachToAvatarAnchorPointId.NameTag,
-    })
-  );
-
-  onEnterSceneObservable.add((player) => {
-    if (player.userId !== myPlayerId?.userId) {
-      e.addComponentOrReplace(
-        new AttachToAvatar({
-          avatarId: player.userId,
-          anchorPointId: AttachToAvatarAnchorPointId.RightHand,
-        })
-      );
-    }
-  });
-
-  onLeaveSceneObservable.add((player) => {
-    if (player.userId !== myPlayerId?.userId) {
-      e.removeComponent(AttachToAvatar);
-    }
-  });
-});

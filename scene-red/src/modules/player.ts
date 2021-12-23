@@ -14,7 +14,7 @@ export class Player {
   ballManager: BallManager
   enemyManager: EnemyManager
   cam: Camera
-  color: teamColor = teamColor.BLUE
+  color: teamColor = teamColor.RED
   //testDummy: Entity
   //dummyAnimator: Animator
   //clipThrow: AnimationState
@@ -52,6 +52,8 @@ export class Player {
         new GLTFShape('models/self_marker_red.glb')
       ).isPointerBlocker = false
     }
+
+   
     this.collider.addComponent(new SelfCollider())
 
     engine.addEntity(this.collider)
@@ -128,8 +130,8 @@ export class Player {
     )
   }
   collectAmmo() {
-    this.ammoSys.isActive = true
-    triggerEmote({ predefined: PredefinedEmote.CRAFTING })
+    this.ammoSys.isActive = true   
+    triggerEmote({ predefined: 'crafting' as any })
   }
   stopCollectAmmo() {
     this.ammoSys.isActive = false
@@ -175,13 +177,13 @@ class AmmoTimerSystem {
         this.elapsed += dt
       } 
       else {
-        if (this.playerRef.isOnDefaultParcel) {
+        //if (this.playerRef.isOnDefaultParcel) {
           if (this.playerRef.ammo < this.playerRef.maxAmmo) {
             this.playerRef.ammo++
             log('AMMO: ' + this.playerRef.ammo + '/' + this.playerRef.maxAmmo)
             updateAmmo(this.playerRef.ammo, this.playerRef.maxAmmo)
           }
-        }
+      //  }
         this.elapsed = 0
         triggerEmote({ predefined: PredefinedEmote.CRAFTING })
       }
