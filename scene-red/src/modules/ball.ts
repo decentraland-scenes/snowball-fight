@@ -1,20 +1,21 @@
-// import { scene } from "./sceneData";
-// import { physicsBall } from "./physicsBall";
-// //import { sendToServer } from "./playfabapi";
-// import { player } from "./playerData";
+
 import { distance, ToDegrees, reflectVec3 } from './utilities'
 import { ExplosionInfo, Explosion, splatSpawner } from './explosion'
-// //import { match } from "./match";
 import * as mySounds from './sounds'
-//import { PhysicsBallCollider } from "./physicsBall";
-//import { worldNoGravity, physicsMaterial, FIXED_TIME_STEPS, MAX_TIME_STEPS } from "./physics/world";
 import { player, SelfCollider } from './player'
 import { teamColor } from './teamColors'
 import { Room } from 'colyseus.js'
 import { OtherCollider } from './otherPlayer'
 import { PredefinedEmote, triggerEmote } from '@decentraland/RestrictedActions'
 
-// import { setKickForceUI } from "./ui";
+//preload dummy
+const ballShape = new GLTFShape('models/snowball.glb')
+let dummyBall = new Entity()
+dummyBall.addComponent(new Transform({
+  position: new Vector3(player.cam.feetPosition.x, -1, player.cam.feetPosition.z)
+}))
+dummyBall.addComponent( ballShape)
+engine.addEntity(dummyBall)
 
 export class Ball {
   gravity: number = 5
@@ -53,7 +54,7 @@ export class Ball {
     this.room = room
     this.myBall = _myBall
 
-    this.ballShape = new GLTFShape('models/snowball.glb')
+    this.ballShape = ballShape
     this.ballEntity = new Entity()
     this.bounceEmitter = new Entity()
 

@@ -1,5 +1,23 @@
 import * as mySounds from "./sounds"
 
+//preload dummy explo
+const explosionShape = new GLTFShape('models/explosion.glb')
+let dummyExplosion = new Entity()
+dummyExplosion.addComponent(new Transform({
+  position: new Vector3(0, -2, 0)
+}))
+dummyExplosion.addComponent( explosionShape)
+engine.addEntity(dummyExplosion)
+
+//preload splat
+const splatShape = new GLTFShape('models/splat.glb')
+let dummySplat= new Entity()
+dummySplat.addComponent(new Transform({
+  position: new Vector3(0, -2, 0)
+}))
+dummySplat.addComponent( splatShape)
+engine.addEntity(dummySplat)
+
 @Component("ExplosionInfo")
 export class ExplosionInfo { 
 
@@ -38,7 +56,7 @@ export class Explosion extends Entity{
         rotation: _rotation,
         scale: new Vector3(0.5, 0.5, 0.5)
       }))
-      this.addComponent(new GLTFShape('models/explosion.glb'))
+      this.addComponent(explosionShape)
       this.addComponent(new ExplosionInfo(13/30, this))
   
     //   this.smoke = new Entity()
@@ -81,7 +99,7 @@ export class Explosion extends Entity{
         rotation: _rotation,
         scale: new Vector3(2,1,2)
       }))
-      splat.addComponentOrReplace(new GLTFShape('models/splat.glb'))        
+      splat.addComponentOrReplace(splatShape)        
       splat.addComponentOrReplace(new SplatTimeout(5, splat))        
   
       //add entity to engine

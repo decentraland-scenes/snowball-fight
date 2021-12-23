@@ -26,6 +26,18 @@ export let MatchTimeContainer = new UIContainerRect(TopScoresContainer)
     MatchTimeContainer.positionY = 20
     MatchTimeContainer.color = Color4.FromHexString(`#00000088`)
 
+export let lobbyMessage = new UIText(MatchTimeContainer)
+
+    lobbyMessage.value = 'until next match'
+    lobbyMessage.fontSize = 12
+    lobbyMessage.width = '100%'
+    lobbyMessage.vAlign = 'center'
+    lobbyMessage.hAlign = 'center'
+    lobbyMessage.hTextAlign = 'center'
+    lobbyMessage.vTextAlign = 'center'
+    lobbyMessage.positionY = '-100%'
+    lobbyMessage.textWrapping = false
+
 export let MatchTimerMessage = new UIText(MatchTimeContainer)
 
     MatchTimerMessage.value = '00:00'
@@ -37,6 +49,10 @@ export let MatchTimerMessage = new UIText(MatchTimeContainer)
     MatchTimerMessage.vTextAlign = 'center'
     MatchTimerMessage.positionY = -2
     MatchTimerMessage.textWrapping = true
+
+export function showLobbyMessage(_visible:boolean){
+  lobbyMessage.visible = _visible
+}      
 
 export function updateGameTime(_timeInSeconds:number){
 

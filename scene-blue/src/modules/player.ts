@@ -15,6 +15,8 @@ export class Player {
   enemyManager: EnemyManager
   cam: Camera
   color: teamColor = teamColor.BLUE
+  handBallRoot:Entity
+  handBall:Entity
   //testDummy: Entity
   //dummyAnimator: Animator
   //clipThrow: AnimationState
@@ -60,6 +62,22 @@ export class Player {
 
     this.collider.setParent(Attachable.AVATAR)
 
+    this.handBallRoot = new Entity()
+    // this.handBall.addComponent(new Transform({
+    //   position: new Vector3(this.cam.position.x, -1, this.cam.feetPosition.z)
+    // }))
+    //this.handBall.addComponent( new GLTFShape('models/snowball.glb'))
+    engine.addEntity(this.handBallRoot)
+
+    this.handBall = new Entity()
+    this.handBall.addComponent(new Transform({
+      position: new Vector3(0.05,0.1, 0.0),
+      scale: new Vector3(0.3, 0.3, 0.3)
+    }))
+    this.handBall.addComponent( new GLTFShape('models/snowball.glb'))
+   
+    
+    
     //animation testing
     // this.testDummy = new Entity()
     // this.testDummy.addComponent(
@@ -99,8 +117,9 @@ export class Player {
     if (this.roomConnected) {
       this.ammo -= 1
 
-      if (this.ammo < 0) {
+      if (this.ammo <= 0) {
         this.ammo = 0
+        this.handBall.getComponent(Transform).scale.setAll(0)
       }
       player.inCooldown = true
       updateAmmo(this.ammo, this.maxAmmo)
@@ -130,7 +149,19 @@ export class Player {
     )
   }
   collectAmmo() {
-    this.ammoSys.isActive = true   
+
+    if(!this.handBallRoot.hasComponent(AttachToAvatar)){
+     this.handBallRoot.addComponent(new AttachToAvatar({
+        avatarId:this.id,
+        anchorPointId: AttachToAvatarAnchorPointId.RightHand
+      }))
+      this.handBall.setParent(this.handBallRoot)
+    }
+    else{
+      this.handBall.getComponent(Transform).scale.setAll(0.3)
+    }
+
+    this.ammoSys.isActive = true       
     triggerEmote({ predefined: 'crafting' as any })
   }
   stopCollectAmmo() {
@@ -180,7 +211,7 @@ class AmmoTimerSystem {
         if (this.playerRef.isOnDefaultParcel) {
           if (this.playerRef.ammo < this.playerRef.maxAmmo) {
             this.playerRef.ammo++
-            log('AMMO: ' + this.playerRef.ammo + '/' + this.playerRef.maxAmmo)
+           // log('AMMO: ' + this.playerRef.ammo + '/' + this.playerRef.maxAmmo)
             updateAmmo(this.playerRef.ammo, this.playerRef.maxAmmo)
           }
         }

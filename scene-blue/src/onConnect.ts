@@ -177,12 +177,14 @@ export async function onConnect(room: Room) {
   room.onMessage('lobbytime', (data) => {
     //log("SERVER is in LOBBY WATING state : " + data.currentTime  )
     ui.updateGameTime(data.currentTime)
-    ui.DisplayCursorMessage('NEXT MATCH STARTING IN:', data.currentTime)
+    ui.showLobbyMessage(true)
+   // ui.DisplayCursorMessage('NEXT MATCH STARTING IN:', data.currentTime)
   })
 
   // START MATCH
   room.onMessage('startMatch', () => {
     log('MATCH STARTED')
+    ui.showLobbyMessage(false)
     ui.resetUIScores()
     ui.HideCursorMessage()
     ui.DisplayCursorMessage('GAME STARTED!', 'GO GO GO', 2)
@@ -192,6 +194,7 @@ export async function onConnect(room: Room) {
   room.onMessage('matchIsLive', () => {
     //ui.resetUIScores()
     //ui.HideCursorMessage()
+    ui.showLobbyMessage(false)
     ui.DisplayCursorMessage('GAME IS LIVE!', 'GO GO GO', 2)
     player.matchStarted = true
   })
