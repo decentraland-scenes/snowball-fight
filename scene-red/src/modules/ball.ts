@@ -44,7 +44,7 @@ export class Ball {
   kickID: number = 0
   ownBall: boolean = true
   room: Room
-  teamColor: teamColor = teamColor.BLUE
+  teamColor: teamColor = teamColor.RED
   myBall: boolean = false
   //physicsCollider:PhysicsBallCollider
 
@@ -276,8 +276,8 @@ class BallThrowSystem {
                     e.hitPoint.y,
                     e.hitPoint.z
                   )
-                  ball.onCollide(hitPoint, normal)
-                  triggerEmote({ predefined: PredefinedEmote.SNOWBALLHIT })
+                  ball.onCollide(hitPoint, normal)                  
+                  triggerEmote({ predefined: 'snowballhit' as any })
                   //player.clipHit.play(true)
                 }
               }
@@ -285,27 +285,12 @@ class BallThrowSystem {
               else if (
                 engine.entities[e.entity.entityId].hasComponent(OtherCollider)
               ) {
-                engine.entities[e.entity.entityId].getComponent(OtherCollider)
+                //engine.entities[e.entity.entityId].getComponent(OtherCollider)
                 //teammate was hit
-                if (
-                  ball.teamColor ==
-                  engine.entities[e.entity.entityId].getComponent(OtherCollider)
-                    .color
-                ) {
+                
+                //someone was hit                
                   log(
-                    'Teammate player hit with ' +
-                      ball.teamColor +
-                      ' ball (other player is ' +
-                      engine.entities[e.entity.entityId].getComponent(
-                        OtherCollider
-                      ).color +
-                      ')'
-                  )
-                }
-                //enemy was hit
-                else {
-                  log(
-                    'Enemy player hit with ' +
+                    'Other player hit with ' +
                       ball.teamColor +
                       ' ball (enemy color is: ' +
                       engine.entities[e.entity.entityId].getComponent(
@@ -331,8 +316,7 @@ class BallThrowSystem {
                         OtherCollider
                       ).id
                     )
-                  }
-                }
+                  }                
               }
             } else {
               log('environment hit with ' + ball.teamColor + ' ball')
@@ -351,14 +335,7 @@ class BallThrowSystem {
             }
           }
         })
-        /* for (let collider of this.colliderGroup.entities) {
-                        let newDir = collider.getComponent(VerticalCyllinderCollider).collide(nextPos, ball.moveVector, ball.ballRadius)
-
-                        if(newDir != null){
-                        ball.moveVector = newDir
-                        }
-                        
-                    } */
+       
 
         //move ball
         if (

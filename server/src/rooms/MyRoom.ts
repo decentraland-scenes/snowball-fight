@@ -114,9 +114,9 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('pickColor', (client, message) => {
       const player = this.state.players.get(client.sessionId)      
       player.teamColor = message.teamColor
-      this.broadcast("flashColor", {id:player.id, teamColor: message.teamColor})      
-      console.log(player.name, ' picked color ', message.teamColor)
-      player.score ++
+      this.broadcast("setEnemyColor", {id:player.id, teamColor: message.teamColor})      
+      console.log(player.name, ' is now color ', message.teamColor)
+      //player.score ++
 
     })
   
@@ -127,32 +127,45 @@ export class MyRoom extends Room<MyRoomState> {
     })
   
     this.onMessage('enemyHit', (client, message) => {
-      const enemy = this.state.players.get(message.id)            
+
+      let enemy:Player = null
+      this.state.players.forEach((player) =>{
+        if(player.wallet == message.id){
+          enemy = player
+        }
+      })
       const player = this.state.players.get(client.sessionId)  
+      console.log("enemy hit: "+ message.id,  )
+      
 
-      if(this.state.inMatch){
-        player.score ++
-        console.log("player score: "+ player.score )
+      if(this.state.inMatch && enemy != null){
+        console.log("enemy color: "+ enemy.teamColor  )
         switch(enemy.teamColor){
-
           // POINT FOR RED TEAM (blue player was hit)
           case 0:{
-            this.state.redScore ++
-            console.log("incrementing red Score: " + this.state.redScore)
-           
-            // redTeamDoc.update({ 
-            //   score: this.state.redScore
-            // });
+            if(player.teamColor == 1){
+              this.state.redScore ++
+              player.score ++
+              console.log("player score: "+ player.score )
+              console.log("incrementing red Score: " + this.state.redScore)
+            }
+            else{
+              console.log("teammate hit: " + this.state.redScore)
+            }            
             break
           }
-          // POINT FOR BLUE TEAM (blue player was hit)
+
+          // POINT FOR BLUE TEAM (red player was hit)
           case 1:{
-  
-            this.state.blueScore ++
-            console.log("incrementing blue Score: " + this.state.blueScore)
-            // blueTeamDoc.update({  
-            //   score: this.state.blueScore
-            // });
+            if(player.teamColor == 0){
+              this.state.blueScore ++
+              player.score ++
+              console.log("player score: "+ player.score )
+              console.log("incrementing blue Score: " + this.state.blueScore)
+            }
+            else{
+              console.log("teammate hit: " + this.state.blueScore)
+            }           
             break
           }
         }
@@ -183,6 +196,21 @@ export class MyRoom extends Room<MyRoomState> {
       
     })
 
+    this.onMessage('getUserColor', (client, message) => {
+      let enemy:Player = null
+      this.state.players.forEach((player) =>{
+        if(player.wallet == message.id){
+          enemy = player
+        }
+      })
+
+      if(enemy != null){
+        client.send('setEnemyColor', {id:message.id, color:enemy.teamColor })
+        console.log('found enemy, sending color', enemy.teamColor)
+      }           
+      
+    })
+
   }
 
   onJoin(client: Client, options: any) {
@@ -196,23 +224,23 @@ export class MyRoom extends Room<MyRoomState> {
     
     switch(options.color){
       case 0:{
-        console.log(newPlayer.name, 'joined the BLUE team! => ', options.color, options.userData)
+        console.log(newPlayer.name, 'joined the BLUE team! => ', options.color)
         newPlayer.teamColor = teamColor.BLUE
         break
       }
       case 1:{
-        console.log(newPlayer.name, 'joined the RED team! => ', options.color, options.userData)
+        console.log(newPlayer.name, 'joined the RED team! => ', options.color)
         newPlayer.teamColor = teamColor.RED
         break
       }
     }    
     
-    client.send("updateID", {id:client.id} )
-    this.broadcast("newPlayerJoined", {id:client.id, color:newPlayer.teamColor}, {except:client})
+    client.send("updateID", {id:newPlayer.wallet} )
+    this.broadcast("newPlayerJoined", {id:newPlayer.wallet, color:newPlayer.teamColor}, {except:client})
 
     //send all current players to the new player
     this.state.players.forEach( (player)=>{
-      client.send("newPlayerJoined", {id:player.id, color:player.teamColor})
+      client.send("newPlayerJoined", {id:player.wallet, color:player.teamColor})
     })
 
     if(this.state.inMatch){
