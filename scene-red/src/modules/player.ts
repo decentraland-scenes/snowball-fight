@@ -177,15 +177,15 @@ class AmmoTimerSystem {
         this.elapsed += dt
       } 
       else {
-        //if (this.playerRef.isOnDefaultParcel) {
+        if (this.playerRef.isOnDefaultParcel) {
           if (this.playerRef.ammo < this.playerRef.maxAmmo) {
             this.playerRef.ammo++
             log('AMMO: ' + this.playerRef.ammo + '/' + this.playerRef.maxAmmo)
             updateAmmo(this.playerRef.ammo, this.playerRef.maxAmmo)
           }
-      //  }
+        }
         this.elapsed = 0
-        triggerEmote({ predefined: PredefinedEmote.CRAFTING })
+        triggerEmote({ predefined: 'crafting' as any })
       }
     }
   }

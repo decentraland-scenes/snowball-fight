@@ -27,29 +27,29 @@ import { player } from "./player"
 // }
 
 
-// export const modArea = new Entity()
+export const modArea = new Entity()
 
-// modArea.addComponent(
-//   new AvatarModifierArea({
-//     area: { box: new Vector3(10, 10, 10)},
-//     modifiers: [AvatarModifiers.HIDE_AVATARS],
-//   })
-// )
-// modArea.addComponent(
-//   new Transform({
-//     position: new Vector3(0, 0, 0),
-//   })
-// )
-// engine.addEntity(modArea)
+modArea.addComponent(
+  new AvatarModifierArea({
+    area: { box: new Vector3(20, 10, 20)},
+    modifiers: [AvatarModifiers.DISABLE_PASSPORTS],
+  })
+)
+modArea.addComponent(
+  new Transform({
+    position: new Vector3(0, 0, 0),
+  })
+)
+engine.addEntity(modArea)
   
-// class ModAreaUpdateSys {
-//   modAreaRef:Entity
+class ModAreaUpdateSys {
+  modAreaRef:Entity
 
-//   constructor(_modArea:Entity){
-//     this.modAreaRef = _modArea
-//   }
-//   update(dt:number){
-//       this.modAreaRef.getComponent(Transform).position.copyFrom(player.cam.feetPosition)
-//   }
-// }
-// engine.addSystem(new ModAreaUpdateSys(modArea))
+  constructor(_modArea:Entity){
+    this.modAreaRef = _modArea
+  }
+  update(dt:number){
+      this.modAreaRef.getComponent(Transform).position.copyFrom(player.cam.feetPosition)
+  }
+}
+engine.addSystem(new ModAreaUpdateSys(modArea))

@@ -19,8 +19,8 @@ export let room: Room | undefined = undefined
 export async function connect(roomName: string, options: any = {}) {
   disconnect()
 
-  //const isPreview = await isPreviewMode()
-  const isPreview = false
+  const isPreview = await isPreviewMode()
+  //const isPreview = false
   const realm = await getCurrentRealm()
 
   //
@@ -88,7 +88,7 @@ function addConnectionDebugger(endpoint: string, isPreview: boolean) {
   message.hTextAlign = 'center'
   message.vAlign = 'bottom'
   message.positionX = -80
-  setServerStatusUI(`Connecting to ${endpoint}`, Color4.Green())
+  
 
   if (isPreview) {
     updateConnectionMessage(`Connecting to ${endpoint}`, Color4.White())
@@ -104,6 +104,7 @@ function updateConnectionMessage(value: string, color: Color4) {
 function updateConnectionDebugger(room: Room, isPreview?: boolean) {
   if (isPreview) {
     updateConnectionMessage('Connected.', Color4.Green())
+    setServerStatusUI('Connected.', Color4.Green())
   } else {
     message.visible = false
   }

@@ -67,23 +67,23 @@ export function updateGameTime(_timeInSeconds:number){
 
 // TOP EDGE - SCORES
 
-export let TopSnow2 = new UIContainerRect(TopScoresContainer)
-TopSnow2.visible = true
-TopSnow2.height = '75%'    
-TopSnow2.hAlign = 'center'
-TopSnow2.vAlign = 'center'
-TopSnow2.width = '40%'
-TopSnow2.positionY = 40
-TopSnow2.color = Color4.FromHexString(`#ffffffff`)
+// export let TopSnow2 = new UIContainerRect(TopScoresContainer)
+// TopSnow2.visible = true
+// TopSnow2.height = '75%'    
+// TopSnow2.hAlign = 'center'
+// TopSnow2.vAlign = 'center'
+// TopSnow2.width = '40%'
+// TopSnow2.positionY = 40
+// TopSnow2.color = Color4.FromHexString(`#ffffffff`)
 
-export let TopSnow = new UIContainerRect(TopScoresContainer)
-TopSnow.visible = true
-TopSnow.height = '75%'    
-TopSnow.hAlign = 'center'
-TopSnow.vAlign = 'center'
-TopSnow.width = '40%'
-TopSnow.positionY = 34
-TopSnow.color = Color4.FromHexString(`#ccccccff`)
+// export let TopSnow = new UIContainerRect(TopScoresContainer)
+// TopSnow.visible = true
+// TopSnow.height = '75%'    
+// TopSnow.hAlign = 'center'
+// TopSnow.vAlign = 'center'
+// TopSnow.width = '40%'
+// TopSnow.positionY = 34
+// TopSnow.color = Color4.FromHexString(`#ccccccff`)
 
 
 
@@ -159,23 +159,23 @@ BottomContainer.vAlign = 'bottom'
 BottomContainer.width = "30%"
 //BottomContainer.color = Color4.FromHexString(`#00000088`)
 
-export let AmmoSnow = new UIContainerRect(BottomContainer)
-AmmoSnow.visible = true
-AmmoSnow.height = '12%'    
-AmmoSnow.hAlign = 'center'
-AmmoSnow.vAlign = 'bottom'
-AmmoSnow.width = '40%'
-AmmoSnow.positionY = 40
-AmmoSnow.color = Color4.FromHexString(`#ffffffff`)
+// export let AmmoSnow = new UIContainerRect(BottomContainer)
+// AmmoSnow.visible = true
+// AmmoSnow.height = '12%'    
+// AmmoSnow.hAlign = 'center'
+// AmmoSnow.vAlign = 'bottom'
+// AmmoSnow.width = '40%'
+// AmmoSnow.positionY = 40
+// AmmoSnow.color = Color4.FromHexString(`#ffffffff`)
 
-export let AmmoSnow2 = new UIContainerRect(BottomContainer)
-AmmoSnow2.visible = true
-AmmoSnow2.height = '12%'    
-AmmoSnow2.hAlign = 'center'
-AmmoSnow2.vAlign = 'bottom'
-AmmoSnow2.width = '40%'
-AmmoSnow2.positionY = 35
-AmmoSnow2.color = Color4.FromHexString(`#ccccccff`)
+// export let AmmoSnow2 = new UIContainerRect(BottomContainer)
+// AmmoSnow2.visible = true
+// AmmoSnow2.height = '12%'    
+// AmmoSnow2.hAlign = 'center'
+// AmmoSnow2.vAlign = 'bottom'
+// AmmoSnow2.width = '40%'
+// AmmoSnow2.positionY = 35
+// AmmoSnow2.color = Color4.FromHexString(`#ccccccff`)
 
 export let AmmoContainer = new UIContainerRect(BottomContainer)
 AmmoContainer.visible = true

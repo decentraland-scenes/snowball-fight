@@ -17,8 +17,8 @@ export async function onConnect(room: Room) {
   engine.addSystem(new EnemyUpdateSystem(player.enemyManager))
 
   getUserData().then((myPlayerId) => {
-      
-    onEnterSceneObservable.add((enemy) => {
+    log("adding observable triggers")  
+    onPlayerConnectedObservable.add((enemy) => {
       log("Player entered with ID:" + enemy.userId)
       if (enemy.userId !== myPlayerId?.userId) {    
         log("is not my own id:" +  myPlayerId?.userId)
@@ -52,11 +52,11 @@ export async function onConnect(room: Room) {
     });
   
   
-    onLeaveSceneObservable.add((enemy) => {
+    onPlayerDisconnectedObservable.add((enemy) => {
       if (player.enemyManager.getEnemyByID(enemy.userId) != null ) {
         let existingEnemy = player.enemyManager.getEnemyByID(enemy.userId)
         existingEnemy.collider.removeComponent(AttachToAvatar)    
-       // player.enemyManager.removeEnemy(enemy.userId) 
+       log('player not visible anymore: '+ enemy.userId)
       }      
     });
   });
@@ -76,7 +76,7 @@ export async function onConnect(room: Room) {
 
   room.onMessage('setEnemyColor', (data) => {
     switch (data.teamColor) {
-      case teamColor.BLUE: {
+      case 0: {
         log('SERVER BLUE')
         //blueCone.activate()
         player.enemyManager.setEnemyColor(data.id,teamColor.BLUE)
@@ -218,33 +218,36 @@ export async function onConnect(room: Room) {
     ui.updateUIScores(data.scoreBlue, data.scoreRed)
   })
 
-  // class SendPlayerDataSystem {
-  //   freq: number = 1 / 6
-  //   playerRef: Player
 
-  //   constructor(_player: Player) {
-  //     this.playerRef = _player
-  //   }
-  //   update(dt: number) {
-  //     if (this.freq > 0) {
-  //       this.freq -= dt
-  //     } else {
-  //       this.freq = 1 / 6
-  //       //SEND POS DATA
-  //       if (this.playerRef.roomConnected) {
-  //         this.playerRef.room.send('playerPos', {
-  //           id: this.playerRef.id,
-  //           pos: this.playerRef.cam.position,
-  //           rot: this.playerRef.getHorizontalRotation(),
-  //         })
-  //         //log("sendPOS: ID: " + this.playerRef.id + ", POS: " + this.playerRef.cam.position)
-  //       }
+  class CheckParcelSystem {
+    freq: number = 1 / 6
+    playerRef: Player
 
-  //       //CHECK IF PLAYER IS STANDING ON A DEFAULT PARCEL
-  //       this.playerRef.checkDefaultParcel()
-  //     }
-  //   }
-  // }
+    constructor(_player: Player) {
+      this.playerRef = _player
+    }
+    update(dt: number) {
+      if (this.freq > 0) {
+        this.freq -= dt
+      } else {
+        this.freq = 1 / 6
+        //SEND POS DATA
+        // if (this.playerRef.roomConnected) {
+        //   this.playerRef.room.send('playerPos', {
+        //     id: this.playerRef.id,
+        //     pos: this.playerRef.cam.position,
+        //     rot: this.playerRef.getHorizontalRotation(),
+        //   })
+        
+          //log("sendPOS: ID: " + this.playerRef.id + ", POS: " + this.playerRef.cam.position)
+        //}
 
-  // engine.addSystem(new SendPlayerDataSystem(player))
+        //CHECK IF PLAYER IS STANDING ON A DEFAULT PARCEL
+        this.playerRef.checkDefaultParcel()
+      }
+    }
+  }
+
+  engine.addSystem(new CheckParcelSystem(player))
+
 }
