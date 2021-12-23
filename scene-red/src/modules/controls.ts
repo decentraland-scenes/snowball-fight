@@ -3,6 +3,7 @@ import { BallManager } from "./ball"
 import { triggerEmote, PredefinedEmote,  } from "@decentraland/RestrictedActions"
 import { player } from "./player"
 import { DisplayCursorMessage, DisplayServerMessage } from "./ui"
+import { teamColor } from "./teamColors"
 
 //let player = Camera.instance
 
@@ -59,6 +60,7 @@ input.subscribe("BUTTON_DOWN", ActionButton.SECONDARY, true, e => {
              
     
 })
+
 
 // COLLECT SNOW FOR AMMO
 input.subscribe("BUTTON_UP", ActionButton.SECONDARY, true, e => {

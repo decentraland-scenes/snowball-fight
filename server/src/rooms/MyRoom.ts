@@ -16,8 +16,8 @@ const WITH_FIREBASE_SAVING = true
 export class MyRoom extends Room<MyRoomState> {
 
   public matchIntervalLoop!: Delayed;
-  public roundTime: number = 1000 * 60 * 3  
-  public lobbyTime: number = 1000 * 60 * 0.5  
+  public roundTime: number = 1000 * 60 * 9  
+  public lobbyTime: number = 1000 * 60 * 1  
   //private db:FirebaseFirestore.Firestore    
   private matchElapsed:number = 0
   private lobbyElapsed:number = 0
@@ -63,6 +63,11 @@ export class MyRoom extends Room<MyRoomState> {
         if(this.state.blueScore == this.state.redScore){
           this.broadcast("endMatch", {winner:2})
         }
+
+        if(this.state.bestPlayerScore > 0){
+          this.broadcast('bestPlayer', {name:this.state.bestPlayerName, team:this.state.bestPlayerTeam, score:this.state.bestPlayerScore})
+        }
+       
       }     
     }
     else{
@@ -171,6 +176,9 @@ export class MyRoom extends Room<MyRoomState> {
         }
         this.broadcast("score", {scoreBlue:this.state.blueScore, scoreRed:this.state.redScore })       
         console.log(message.id, ' was hit!! they were on team: ', enemy.teamColor)
+
+        this.state.checkBestPlayer(player)
+
       }      
     })
 
@@ -271,14 +279,16 @@ export class MyRoom extends Room<MyRoomState> {
     if(WITH_FIREBASE_SAVING){
       if((_blueScore > 0) || (_redScore > 0)){
 
-        const matchId = (this.state.startTime + "-" + this.state.server + "-" + this.state.island)
+        const matchId = (this.state.startTime + "-" + this.state.server )
 
         const write = await db.collection('matches').doc(matchId).set({
           timeStamp:  this.state.startTime,
           blueScore:  _blueScore,
           redScore:  _redScore,
           server: this.state.server,
-          island: this.state.island
+          bestPlayer: this.state.bestPlayerName,
+          bestPlayerTeam: this.state.bestPlayerTeam,
+          bestPlayerScore: this.state.bestPlayerScore
 
         });
 

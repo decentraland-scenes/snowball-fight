@@ -39,6 +39,9 @@ export class MyRoomState extends Schema {
   @type('string') startTime: string = "0"
   @type('string') server: string = "preview"
   @type('string') island: string = "preview"
+  @type('string') bestPlayerName: string = "-"
+  @type('number') bestPlayerTeam: number = 0
+  @type('number') bestPlayerScore: number = 0
 
   constructor(time: number = 0){
     super()
@@ -48,9 +51,20 @@ export class MyRoomState extends Schema {
   resetScores(){
     this.redScore = 0
     this.blueScore = 0
+    this.bestPlayerName = "-"
+    this.bestPlayerTeam = 0
+    this.bestPlayerScore = 0
 
     this.players.forEach((player) => {
       player.score = 0
     })
+  }
+
+  checkBestPlayer(player:Player){
+    if(player.score > this.bestPlayerScore){
+      this.bestPlayerName = player.name
+      this.bestPlayerTeam = player.teamColor
+      this.bestPlayerScore = player.score
+    }
   }
 }

@@ -60,9 +60,7 @@ export function updateGameTime(_timeInSeconds:number){
     let seconds = Math.floor(Math.floor(_timeInSeconds)%60)
     let secondsString = seconds.toString()
 
-                if (seconds < 10){
-                    secondsString = ("0" + seconds )                 
-                }                
+                               
                 if (_timeInSeconds > 10){
                     secondsString = seconds.toString()  
                     MatchTimerMessage.color = Color4.White()                  
@@ -74,6 +72,9 @@ export function updateGameTime(_timeInSeconds:number){
                     MatchTimerMessage.color = Color4.FromHexString("#ff4a35ff")
                     MatchTimerMessage.fontSize = 20
                 }
+                if (seconds < 10){
+                  secondsString = ("0" + secondsString )                 
+                } 
 
                 
                 MatchTimerMessage.value = ("0" + minutes + ":" + secondsString)
@@ -235,7 +236,7 @@ const activeTextColor = Color4.FromHexString(`#ffffffff`)
 const inactiveTextColor = Color4.FromHexString(`#888888ff`)
 
 let serverConnectionCard = new UIContainerRect(BottomContainer)
-serverConnectionCard.visible = true
+serverConnectionCard.visible = false
 serverConnectionCard.height = '10%'
 serverConnectionCard.hAlign = 'center'
 serverConnectionCard.vAlign = 'bottom'
@@ -291,12 +292,17 @@ serverStatusText.shadowOffsetX = -2
 serverStatusText.shadowOffsetY = -2
 
 export function setServerStatusUI(text:string, _color?:Color4) {
+    serverConnectionCard.visible = true
     serverStatusText.value = text
 
     if(_color){
         serverStatusText.color = _color
         serverStatusText.outlineColor = _color
     }
+}
+
+export function hideServerStatusUI() {
+  serverConnectionCard.visible = false
 }
 
 
@@ -390,12 +396,21 @@ export function displayInstructions(display:boolean){
 
 
 
-export function DisplayCursorMessage(title:string, message:string, timeOut?:number){
+export function DisplayCursorMessage(title:string, message:string, timeOut?:number, color?:Color4){
   
 
   CursorMessage.value = message
   CursorMessageTitle.value = title
   CursorMessageContainer.visible = true
+
+  if(color){
+    CursorMessage.color = color
+    CursorMessage.outlineColor = color
+  }
+  else{
+    CursorMessage.color = Color4.Yellow()
+    CursorMessage.outlineColor = Color4.Yellow()
+  }
 
   if(timeOut){
     if(!cursorTimeoutSys.active){

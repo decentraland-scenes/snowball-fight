@@ -58,9 +58,9 @@ export async function connect(roomName: string, options: any = {}) {
     //
     room = await client.joinOrCreate<any>(roomName, options)
 
-    // if (isPreview) {
+     if (isPreview) {
     updateConnectionDebugger(room, isPreview)
-    // }
+     }
 
     log('Connected!')
     // onConnect(room)
@@ -87,7 +87,7 @@ function addConnectionDebugger(endpoint: string, isPreview: boolean) {
   message.height = 30
   message.hTextAlign = 'center'
   message.vAlign = 'bottom'
-  message.positionX = -80
+  message.positionX = 0
   
 
   if (isPreview) {
@@ -104,7 +104,7 @@ function updateConnectionMessage(value: string, color: Color4) {
 function updateConnectionDebugger(room: Room, isPreview?: boolean) {
   if (isPreview) {
     updateConnectionMessage('Connected.', Color4.Green())
-    setServerStatusUI('Connected.', Color4.Green())
+    //setServerStatusUI('Connected.', Color4.Green())
   } else {
     message.visible = false
   }

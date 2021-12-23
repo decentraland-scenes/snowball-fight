@@ -1,5 +1,6 @@
-import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
+import { getCurrentRealm,  } from '@decentraland/EnvironmentAPI'
 import { getUserData } from '@decentraland/Identity'
+import { getConnectedPlayers } from '@decentraland/Players'
 import { Cone, cubeColor } from './cones'
 import { teamColor } from './modules/teamColors'
 import { connect } from './connection'
@@ -59,20 +60,45 @@ export async function onConnect(room: Room) {
        log('player not visible anymore: '+ enemy.userId)
       }      
     });
-  });
 
-  // REMOVE: add cones
-  let blueCone = new Cone(
-    { position: new Vector3(6, 1, 14) },
-    teamColor.BLUE,
-    room
-  )
 
-  let redCone = new Cone(
-    { position: new Vector3(10, 1, 14) },
-    teamColor.RED,
-    room
-  )
+    // check already connected players and add colliders to them
+    getConnectedPlayers().then(async (players) => {
+      players.forEach(async (enemy) => {
+        log("Checking connected player ID:" + enemy.userId)
+      if (enemy.userId !== myPlayerId?.userId) {    
+        log("is not my own id:" +  myPlayerId?.userId)
+
+        //enemy is already in the local cahce
+        if (player.enemyManager.getEnemyByID(enemy.userId) != null ) {
+          log("we already have this enemy in cache")
+          //attach base collider without color
+          let existingEnemy = player.enemyManager.getEnemyByID(enemy.userId)
+          existingEnemy.collider.addComponentOrReplace(
+            new AttachToAvatar({
+              avatarId: enemy.userId,
+              anchorPointId: AttachToAvatarAnchorPointId.NameTag,
+            })
+          );
+        }
+        else{
+          //create a new enemy in local cache and attach collider
+          log("we don't have this enemy in cache")
+          let newEnemy = player.enemyManager.addEnemy(enemy.userId)
+          newEnemy.collider.addComponentOrReplace(
+            new AttachToAvatar({
+              avatarId: enemy.userId,
+              anchorPointId: AttachToAvatarAnchorPointId.NameTag,
+            })
+          );
+        }
+        //GET THE COLOR OF THE ENEMY FROM SERVER
+        room.send('getUserColor', {id: enemy.userId})
+      }
+      })
+      
+    })
+  });  
 
   room.onMessage('setEnemyColor', (data) => {
     switch (data.teamColor) {
@@ -205,13 +231,13 @@ export async function onConnect(room: Room) {
 
     player.matchStarted = false
     if (data.winner == 0) {
-      ui.DisplayCursorMessage('GAME ENDED', 'BLUE WINS', 4)
+      ui.DisplayCursorMessage('GAME ENDED', 'BLUE WINS', 8, Color4.Blue())
     }
     if (data.winner == 1) {
-      ui.DisplayCursorMessage('GAME ENDED', 'RED WINS', 4)
+      ui.DisplayCursorMessage('GAME ENDED', 'RED WINS', 8, Color4.Red())
     }
     if (data.winner == 2) {
-      ui.DisplayCursorMessage('GAME ENDED', 'TEAMS ARE TIED', 4)
+      ui.DisplayCursorMessage('GAME ENDED', 'TEAMS ARE TIED', 8)
     }
   })
 
@@ -219,6 +245,12 @@ export async function onConnect(room: Room) {
   room.onMessage('score', (data) => {
     log('SCORES ARE UPDATED: ' + data.scoreBlue + ':' + data.scoreRed)
     ui.updateUIScores(data.scoreBlue, data.scoreRed)
+  })
+
+  // BEST PLAYER OF THE MATCH
+  room.onMessage('bestPlayer', (data) => {
+    log('bestPlayer: ' + data.name + ' : ' + data.team + ' : ' + data.score)
+    //ui.(data.scoreBlue, data.scoreRed)
   })
 
   class CheckParcelSystem {

@@ -3,7 +3,7 @@ import { BallManager } from "./ball"
 import { triggerEmote, PredefinedEmote,  } from "@decentraland/RestrictedActions"
 import { player } from "./player"
 import { DisplayCursorMessage, DisplayServerMessage } from "./ui"
-
+import { teamColor } from "./teamColors"
 //let player = Camera.instance
 
 
@@ -67,28 +67,5 @@ input.subscribe("BUTTON_UP", ActionButton.SECONDARY, true, e => {
     
 })
 
-// let dummyEnemy = new Entity()
-// dummyEnemy.addComponent(new Transform({
-//     position: new Vector3(32,0,32)
-// }))
-// dummyEnemy.addComponent(new GLTFShape('models/enemy.glb'))
 
-// engine.addEntity(dummyEnemy)
-// class DummyEnemySystem {
-
-//     direction = new Vector3(0,0.2,-1)    
-//    cooldown:number = 2
-
-//     update(dt: number) { 
-//         if(this.cooldown > 0){
-//             this.cooldown -= dt
-//         }
-//         else{
-//                 player.ballManager.spawnBall().throwBallOther(dummyEnemy.getComponent(Transform).position.add(Vector3.Up()), this.direction,1)
-//                 this.cooldown = 2
-//         }
-//     }
-// }
-
-// engine.addSystem(new DummyEnemySystem())
 

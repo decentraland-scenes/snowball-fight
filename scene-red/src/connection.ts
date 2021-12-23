@@ -88,7 +88,7 @@ function addConnectionDebugger(endpoint: string, isPreview: boolean) {
   message.hTextAlign = 'center'
   message.vAlign = 'bottom'
   message.positionX = -80
-  setServerStatusUI(`Connecting to ${endpoint}`, Color4.Green())
+  //setServerStatusUI(`Connecting to ${endpoint}`, Color4.Green())
 
   if (isPreview) {
     updateConnectionMessage(`Connecting to ${endpoint}`, Color4.White())

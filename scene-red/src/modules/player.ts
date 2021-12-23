@@ -3,7 +3,7 @@ import { Room } from 'colyseus.js'
 import { Ball, BallManager } from './ball'
 import { EnemyManager } from './enemyManager'
 import { teamColor } from './teamColors'
-import { updateAmmo } from './ui'
+import { updateAmmo, DisplayCursorMessage } from './ui'
 
 @Component('SelfCollider')
 export class SelfCollider {}
@@ -25,6 +25,7 @@ export class Player {
   maxAmmo: number = 10
   ammoSys: AmmoTimerSystem
   matchStarted: boolean = false
+  
 
   roomConnected: boolean = false
   room: Room
@@ -76,8 +77,7 @@ export class Player {
     }))
     this.handBall.addComponent( new GLTFShape('models/snowball.glb'))
    
-    
-    
+       
     //animation testing
     // this.testDummy = new Entity()
     // this.testDummy.addComponent(
@@ -150,19 +150,25 @@ export class Player {
   }
   collectAmmo() {
 
-    if(!this.handBallRoot.hasComponent(AttachToAvatar)){
-     this.handBallRoot.addComponent(new AttachToAvatar({
-        avatarId:this.id,
-        anchorPointId: AttachToAvatarAnchorPointId.RightHand
-      }))
-      this.handBall.setParent(this.handBallRoot)
+    if (player.isOnDefaultParcel) {
+      if(!this.handBallRoot.hasComponent(AttachToAvatar)){
+      this.handBallRoot.addComponent(new AttachToAvatar({
+          avatarId:this.id,
+          anchorPointId: AttachToAvatarAnchorPointId.RightHand
+        }))
+        this.handBall.setParent(this.handBallRoot)
+      }
+      else{
+        this.handBall.getComponent(Transform).scale.setAll(0.3)
+      }
+
+      this.ammoSys.isActive = true       
+      triggerEmote({ predefined: 'crafting' as any })
     }
     else{
-      this.handBall.getComponent(Transform).scale.setAll(0.3)
+      DisplayCursorMessage("CRAFTING NOT ALLOWED HERE", "USE EMPTY PARCELS", 2)
     }
 
-    this.ammoSys.isActive = true       
-    triggerEmote({ predefined: 'crafting' as any })
   }
   stopCollectAmmo() {
     this.ammoSys.isActive = false
