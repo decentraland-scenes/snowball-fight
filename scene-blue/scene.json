@@ -6,5 +6,7 @@
     ],
     "base": "0,0"
   },
-  "requiredPermissions": []
+  "requiredPermissions": [
+    "ALLOW_TO_TRIGGER_AVATAR_EMOTE"
+  ]
 }
